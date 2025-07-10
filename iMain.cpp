@@ -17,10 +17,8 @@ void draw_water(int i)
     double x[4] = {(double)0, (double)WIDTH, (double)WIDTH, 0.0};
     double y[4] = {(double)(CELL * i - 1.0 * V * CELL / vertical_scroll_factor), (double)(CELL * i - 1.0 * V * CELL / vertical_scroll_factor - SLOPE * WIDTH), (double)(CELL * i - 1.0 * V * CELL / vertical_scroll_factor + CELL - SLOPE * WIDTH), (double)(CELL * i - 1.0 * V * CELL / vertical_scroll_factor + CELL)};
     iSetColor(99, 227, 255);
-    
-        iFilledPolygon(x, y, 4);
-        
-    
+
+    iFilledPolygon(x, y, 4);
 
     for (int j = 0; j < line[i].data_sz; j++)
     {
@@ -37,23 +35,23 @@ void draw_water(int i)
 
         double x[4] = {(double)pos_x, (double)(pos_x + length), (double)(pos_x + length), (double)pos_x};
         double y[4] = {(double)(pos_y - SLOPE * pos_x), (double)(pos_y - SLOPE * (pos_x + length)), (double)(pos_y + 10 - SLOPE * (pos_x + length)), (double)(pos_y + /* CELL */ 10 - SLOPE * pos_x)};
-        if(line[i].data[j].size != LILYPOD)
-        iFilledPolygon(x, y, 4);
+        if (line[i].data[j].size != LILYPOD)
+            iFilledPolygon(x, y, 4);
 
         double x1[4] = {(double)pos_x, (double)(pos_x + length), (double)(pos_x + length + 20), (double)pos_x + 20};
         double y1[4] = {(double)(pos_y + 10 - SLOPE * pos_x), (double)(pos_y + 10 - SLOPE * (pos_x + length)), (double)(pos_y + CELL - SLOPE * (pos_x + length + 20)), (double)(pos_y + CELL - SLOPE * (pos_x + 20))};
         double x3[4] = {x1[3], x1[2], x1[2], x1[3]};
         double y3[4] = {y1[3] - 10, y1[2] - 10, y1[2], y1[3]};
-        if(line[i].data[j].size != LILYPOD)
-        iFilledPolygon(x3, y3, 4);
+        if (line[i].data[j].size != LILYPOD)
+            iFilledPolygon(x3, y3, 4);
         if (line[i].data[j].size == LILYPOD)
             iSetColor(70, 101, 56);
         else
             iSetColor(81, 41, 34);
-        if(line[i].data[j].size != LILYPOD)    
-        iFilledPolygon(x1, y1, 4);
+        if (line[i].data[j].size != LILYPOD)
+            iFilledPolygon(x1, y1, 4);
         if (line[i].data[j].size == LILYPOD)
-            iShowLoadedImage(round(x[0]), round(y[0]-CELL/5.0), &LILYPAD);
+            iShowLoadedImage(round(x[0]), round(y[0] - CELL / 5.0), &LILYPAD);
     }
 }
 void draw_field(int i)
@@ -61,10 +59,8 @@ void draw_field(int i)
     double x[4] = {(double)0, (double)WIDTH, (double)WIDTH, 0.0};
     double y[4] = {(double)(CELL * i - 1.0 * V * CELL / vertical_scroll_factor), (double)(CELL * i - 1.0 * V * CELL / vertical_scroll_factor - SLOPE * WIDTH), (double)(CELL * i - 1.0 * V * CELL / vertical_scroll_factor + CELL - SLOPE * WIDTH), (double)(CELL * i - 1.0 * V * CELL / vertical_scroll_factor + CELL)};
     iSetColor(154, 172, 59);
-    
-        iFilledPolygon(x, y, 4);
-     
-    
+
+    iFilledPolygon(x, y, 4);
 
     for (int j = 0; j < line[i].data_sz; j++)
     {
@@ -181,7 +177,6 @@ void draw_street(int i, bool bg_only = false)
             else if (line[i].dir == -1)
                 iShowLoadedImage((int)round(x[0] - 15), (int)round(y[0] - (CELL - 24 + 6)), &CAR2);
         }
-        
     }
 }
 void spawn_field(int line_i)
@@ -710,38 +705,42 @@ void iDraw()
     double x[4] = {(double)player.px, (double)(player.px + CELL), (double)(player.px + CELL), (double)player.px};
     double y[4] = {(double)(player.py - SLOPE * player.px), (double)(player.py - SLOPE * (player.px + CELL)), (double)(player.py + CELL - SLOPE * (player.px + CELL)), (double)(player.py + CELL - SLOPE * player.px)};
 
-    for (int i = line_sz - 1; i >= 0; i--) // print serial: road-> player->image
+    for (int i = line_sz - 1; i >= 0; i--) 
     {
 
         if (line[i].type == Street)
             draw_street(i, true);
         else if (line[i].type == Water)
             draw_water(i);
-        
     }
-    
-        
-          
-        
-    for (int i = line_sz - 1; i >= 0; i--) // print serial: road-> player->image
+
+    for (int i = line_sz - 1; i >= 0; i--) 
     {
 
         if (line[i].type == Field)
             draw_field(i);
-        if(i==player.y && Collision!=Drown && eagle.py>=player.py-CELL){
-              /* iSetTransparentColor(238, 167, 39, 0.6);
-            iFilledPolygon(x, y, 4); */
-
-            iShowLoadedImage((int)x[0] , (int)y[0]  + (int)(9 * (player.frame_no <= (int)round(player_fps / 2.0) ? player.frame_no : player_fps - player.frame_no)), &player.file[player.motion]);
+        if(i == player.y && Collision && !deathSound && Collision!=Eagle){
+                playSoundEffect("assets\\sounds\\death.wav",35);
+                deathSound=1;
+            }    
+        if (i == player.y && Collision != Drown && eagle.py >= player.py - CELL)
+        {
+            /* iSetTransparentColor(238, 167, 39, 0.6);
+          iFilledPolygon(x, y, 4); */
+            if(player.frame_no==1){
+                char str[200];
+                int rnd=rand()%5;
+                sprintf(str,"assets\\sounds\\cluck%d.wav",(rnd<1?0:1));
+                playSoundEffect(str,20);
+            }
+            
+            iShowLoadedImage((int)x[0], (int)y[0] + (int)(9 * (player.frame_no <= (int)round(player_fps / 2.0) ? player.frame_no : player_fps - player.frame_no)), &player.file[player.motion]);
         }
         if (line[i].type == Street)
             draw_street(i);
-        /* else if (line[i].type == Water)
-            draw_water(i); */
-       /*  else if (line[i].type == Field)
-            draw_field(i); */
+        
     }
-    iShowLoadedImage(eagle.px,eagle.py,&EAGLE);
+    iShowLoadedImage(eagle.px, eagle.py, &EAGLE);
 }
 
 void iMouseMove(int mx, int my)
@@ -809,13 +808,19 @@ void EagleSpawn()
 {
     if (Collision != Eagle)
         return;
-    if(eagle.py<-HEIGHT){
+    if (eagle.py < -HEIGHT)
+    {
         iPauseTimer(eagle.Timer);
         return;
-    }    
-    eagle.px=(20.0/CELL)*(eagle.py-player.py)+player.px-CELL;
-    eagle.py-=1.0*HEIGHT/eagle.fps;    
-    
+    }
+    eagle.px = (20.0 / CELL) * (eagle.py - player.py) + player.px - CELL;
+    eagle.py -= 1.0 * HEIGHT / eagle.fps;
+    if(fabs(eagle.py-player.py)<CELL){
+        if(!deathSound){
+            playSoundEffect("assets\\sounds\\death.wav",35);
+                deathSound=1;
+        }
+    }
 }
 void Load_Image()
 {
@@ -835,6 +840,7 @@ void Load_Image()
 }
 int main(int argc, char *argv[])
 {
+    initAudio();
     glutInit(&argc, argv);
     srand(time(NULL));
     Load_Image();
@@ -847,9 +853,10 @@ int main(int argc, char *argv[])
     {
         Spawn(i, (i <= start_y + 3 ? true : false));
     }
-    eagle.Timer=iSetTimer(1.0*eagle.speed_ms/eagle.fps, EagleSpawn);
+    eagle.Timer = iSetTimer(1.0 * eagle.speed_ms / eagle.fps, EagleSpawn);
     player.motion = Up;
-
+    
+    playBackgroundMusic("assets\\sounds\\traffic075x.ogg");
     TIME_id = iSetTimer(1000 / FPS, stopwatch);
     player.timer_id = iSetTimer(PLAYER_SPEED / (player_fps), motion);
     iOpenWindow(WIDTH, HEIGHT, "Crossy Road Lite");
