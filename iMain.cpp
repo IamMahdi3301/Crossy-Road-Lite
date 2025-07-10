@@ -6,8 +6,7 @@ add shadows
 2 player
 challenge
 settings:adjust FPS, frames per player position increament, etc
-improve chicken image quality. Screenshots are on iPad
-implement railtrack manually. use variable to change railtrack bar position that will be updated by Hscrollpx
+
 add train bell sound
 */
 
@@ -178,7 +177,7 @@ void draw_street(int i, bool bg_only = false)
         else if (line[i].data[j].size == CAR_LEN)
         {
             if (line[i].dir == 1)
-                iShowLoadedImage((int)round(x[0]), (int)round(y[0] - (CELL - 17 + 6)), &CAR1);
+                iShowLoadedImage((int)round(x[0]), (int)round(y[0] - (CELL - 17 + 9)), &CAR1);
             else if (line[i].dir == -1)
                 iShowLoadedImage((int)round(x[0] - 15), (int)round(y[0] - (CELL - 24 + 6)), &CAR2);
         }
