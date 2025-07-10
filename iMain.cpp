@@ -28,29 +28,29 @@ void draw_water(int i)
             pos_x = pos_x - length;
         int pos_y = CELL * i - 1.0 * V * CELL / vertical_scroll_factor;
 
-        if (line[i].data[j].size == LILYPOD)
+        if (line[i].data[j].size == LILYPAD_LEN)
             iSetColor(70, 101, 56);
         else
             iSetColor(39, 13, 8);
 
         double x[4] = {(double)pos_x, (double)(pos_x + length), (double)(pos_x + length), (double)pos_x};
         double y[4] = {(double)(pos_y - SLOPE * pos_x), (double)(pos_y - SLOPE * (pos_x + length)), (double)(pos_y + 10 - SLOPE * (pos_x + length)), (double)(pos_y + /* CELL */ 10 - SLOPE * pos_x)};
-        if (line[i].data[j].size != LILYPOD)
+        if (line[i].data[j].size != LILYPAD_LEN)
             iFilledPolygon(x, y, 4);
 
         double x1[4] = {(double)pos_x, (double)(pos_x + length), (double)(pos_x + length + 20), (double)pos_x + 20};
         double y1[4] = {(double)(pos_y + 10 - SLOPE * pos_x), (double)(pos_y + 10 - SLOPE * (pos_x + length)), (double)(pos_y + CELL - SLOPE * (pos_x + length + 20)), (double)(pos_y + CELL - SLOPE * (pos_x + 20))};
         double x3[4] = {x1[3], x1[2], x1[2], x1[3]};
         double y3[4] = {y1[3] - 10, y1[2] - 10, y1[2], y1[3]};
-        if (line[i].data[j].size != LILYPOD)
+        if (line[i].data[j].size != LILYPAD_LEN)
             iFilledPolygon(x3, y3, 4);
-        if (line[i].data[j].size == LILYPOD)
+        if (line[i].data[j].size == LILYPAD_LEN)
             iSetColor(70, 101, 56);
         else
             iSetColor(81, 41, 34);
-        if (line[i].data[j].size != LILYPOD)
+        if (line[i].data[j].size != LILYPAD_LEN)
             iFilledPolygon(x1, y1, 4);
-        if (line[i].data[j].size == LILYPOD)
+        if (line[i].data[j].size == LILYPAD_LEN)
             iShowLoadedImage(round(x[0]), round(y[0] - CELL / 5.0), &LILYPAD);
     }
 }
@@ -241,15 +241,15 @@ void spawn_water(int line_i)
         ll pos = WIDTH / (2 * CELL) - 1 - rand() % 3;
         for (int j = cnt / 2 - 1; j >= 0; j--)
         {
-            line[line_i].data[j] = {pos, (double)pos * CELL, LILYPOD};
-            pos -= (4 * LILYPOD + rand() % 5);
+            line[line_i].data[j] = {pos, (double)pos * CELL, LILYPAD_LEN};
+            pos -= (4 * LILYPAD_LEN + rand() % 5);
         }
         pos = WIDTH / (2 * CELL);
         int i;
         for (i = cnt / 2; i < cnt; i++)
         {
-            line[line_i].data[i] = {pos, (double)pos * CELL, LILYPOD};
-            pos += 4 * LILYPOD + rand() % 5;
+            line[line_i].data[i] = {pos, (double)pos * CELL, LILYPAD_LEN};
+            pos += 4 * LILYPAD_LEN + rand() % 5;
         }
     }
 }
@@ -720,18 +720,17 @@ void iDraw()
         if (line[i].type == Field)
             draw_field(i);
         if(i == player.y && Collision && !deathSound && Collision!=Eagle){
-                playSoundEffect("assets\\sounds\\death.wav",35);
+                Audio::playAudio(2,false,35,"assets\\sounds\\death.wav");
                 deathSound=1;
             }    
         if (i == player.y && Collision != Drown && eagle.py >= player.py - CELL)
         {
-            /* iSetTransparentColor(238, 167, 39, 0.6);
-          iFilledPolygon(x, y, 4); */
+            
             if(player.frame_no==1){
                 char str[200];
                 int rnd=rand()%5;
                 sprintf(str,"assets\\sounds\\cluck%d.wav",(rnd<1?0:1));
-                playSoundEffect(str,20);
+                Audio::playAudio(2,false,20,str);
             }
             
             iShowLoadedImage((int)x[0], (int)y[0] + (int)(9 * (player.frame_no <= (int)round(player_fps / 2.0) ? player.frame_no : player_fps - player.frame_no)), &player.file[player.motion]);
@@ -775,6 +774,12 @@ GLUT_KEY_INSERT */
 void iSpecialKeyboard(unsigned char key, int state)
 {
 
+    if(key==GLUT_KEY_END && state == GLUT_DOWN){
+        Audio::pauseAudio(Audio::ALL_CHANNELS);
+        Audio::cleanAudio();
+        iCloseWindow();
+        return;
+    }
     if (key == GLUT_KEY_UP && state == GLUT_DOWN)
     {
 
@@ -817,8 +822,8 @@ void EagleSpawn()
     eagle.py -= 1.0 * HEIGHT / eagle.fps;
     if(fabs(eagle.py-player.py)<CELL){
         if(!deathSound){
-            playSoundEffect("assets\\sounds\\death.wav",35);
-                deathSound=1;
+            Audio::playAudio(2,false,35,"assets\\sounds\\death.wav");
+            deathSound=1;
         }
     }
 }
@@ -840,7 +845,7 @@ void Load_Image()
 }
 int main(int argc, char *argv[])
 {
-    initAudio();
+    Audio::initAudio();
     glutInit(&argc, argv);
     srand(time(NULL));
     Load_Image();
@@ -856,7 +861,7 @@ int main(int argc, char *argv[])
     eagle.Timer = iSetTimer(1.0 * eagle.speed_ms / eagle.fps, EagleSpawn);
     player.motion = Up;
     
-    playBackgroundMusic("assets\\sounds\\traffic075x.ogg");
+    Audio::playAudio(Audio::MUSIC_CHANNEL, true, MIX_MAX_VOLUME, "assets\\sounds\\traffic075x.ogg");
     TIME_id = iSetTimer(1000 / FPS, stopwatch);
     player.timer_id = iSetTimer(PLAYER_SPEED / (player_fps), motion);
     iOpenWindow(WIDTH, HEIGHT, "Crossy Road Lite");

@@ -1,92 +1,133 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 
 using namespace std;
 #define SLOPE 0.2679491924
 #include "iGraphics.h"
-#define HEIGHT /* 800 */1024
-#define WIDTH /* 1000 */1000 
-#define CELL 50   // factor of 10, make objects like cars, logs with slightly less height for better visibility
+#define HEIGHT /* 800 */ 1024
+#define WIDTH /* 1000 */ 1000
+#define CELL 50 // factor of 10, make objects like cars, logs with slightly less height for better visibility
 const int ROW = 1.0 * HEIGHT / CELL;
 #define start_y 4
-#define max_y /* 10 */100
-#define FPS 60          
+#define max_y /* 10 */ 100
+#define FPS 60
 #define PLAYER_SPEED 120 // ms
-const int player_fps=12;
+const int player_fps = 12;
 #define DEG(x) (x) * M_PI / 180
 #define SHADOW false
 #define SHADOW_COLOR 69, 69, 69
-
 #include <SDL.h>
 #include <SDL_mixer.h>
 #include <cstdio>
 
-// Keep global handles so they don't get freed immediately
-Mix_Music* bgm = nullptr;
-Mix_Chunk* sfx = nullptr;
 
-// Call once before any sound functions
-bool initAudio() {
-    if (SDL_Init(SDL_INIT_AUDIO) < 0) {
-        printf("SDL_Init failed: %s\n", SDL_GetError());
-        return false;
+namespace Audio
+{
+    Mix_Music *bgm = nullptr;
+    Mix_Chunk *sfx = nullptr;
+    bool initAudio()
+    {
+        if (SDL_Init(SDL_INIT_AUDIO) < 0)
+        {
+            printf("SDL_Init failed: %s\n", SDL_GetError());
+            return false;
+        }
+        if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
+        {
+            printf("Mix_OpenAudio failed: %s\n", Mix_GetError());
+            return false;
+        }
+        return true;
+    }
+    const int MUSIC_CHANNEL = -2;
+    // channel_id == -2 means "music"
+    void playAudio(int channel_id, bool loop, int volume, const char *filepath)
+    {
+        if (channel_id == Audio::MUSIC_CHANNEL)
+        {
+            if (bgm)
+            {
+                Mix_HaltMusic();
+                Mix_FreeMusic(bgm);
+                bgm = nullptr;
+            }
+
+            bgm = Mix_LoadMUS(filepath);
+            if (!bgm)
+            {
+                printf("Failed to load music: %s\n", Mix_GetError());
+                return;
+            }
+
+            Mix_VolumeMusic(volume);
+            if (Mix_PlayMusic(bgm, loop ? -1 : 1) == -1)
+            {
+                printf("Failed to play music: %s\n", Mix_GetError());
+            }
+        }
+        else
+        {
+            if (sfx)
+            {
+                Mix_FreeChunk(sfx);
+                sfx = nullptr;
+            }
+
+            sfx = Mix_LoadWAV(filepath);
+            if (!sfx)
+            {
+                printf("Failed to load effect: %s\n", Mix_GetError());
+                return;
+            }
+
+            Mix_VolumeChunk(sfx, volume);
+
+            int loops = loop ? -1 : 0;
+            if (Mix_PlayChannel(channel_id, sfx, loops) == -1)
+            {
+                printf("Failed to play chunk: %s\n", Mix_GetError());
+            }
+        }
+    }
+    const int ALL_CHANNELS = -1; 
+    void pauseAudio(int channel_id)
+    {
+        if (channel_id == -2)
+        {
+            // Special: pause music
+            Mix_PauseMusic();
+        }
+        else
+        {
+            // Pause a specific channel (or all if you pass -1)
+            Mix_Pause(channel_id);
+        }
+    }
+    void resumeAudio(int channel_id)
+    {
+        if (channel_id == Audio::MUSIC_CHANNEL)
+        {
+            Mix_ResumeMusic();
+        }
+        else
+        {
+            Mix_Resume(channel_id);
+        }
     }
 
-    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
-        printf("Mix_OpenAudio failed: %s\n", Mix_GetError());
-        return false;
+    void cleanAudio()
+    {
+        if (bgm)
+            Mix_FreeMusic(bgm);
+        if (sfx)
+            Mix_FreeChunk(sfx);
+        Mix_CloseAudio();
+        SDL_Quit();
     }
-
-    return true;
 }
-
-// Play background music in loop — use .ogg or .mp3 if built properly
-void playBackgroundMusic(const char* filepath, int volume = MIX_MAX_VOLUME) {
-    bgm = Mix_LoadMUS(filepath);
-    if (!bgm) {
-        printf("Failed to load music: %s\n", Mix_GetError());
-        return;
-    }
-
-    Mix_VolumeMusic(volume);
-    if (Mix_PlayMusic(bgm, -1) == -1) {
-        printf("Failed to play music: %s\n", Mix_GetError());
-    }
-}
-
-// Play foreground effect with volume — use .wav
-const int EFFECT_CHANNEL = 1;  // any fixed channel number except -1
-
-void playSoundEffect(const char* filepath, int volume = MIX_MAX_VOLUME) {
-    if (sfx) {
-        Mix_FreeChunk(sfx);
-        sfx = nullptr;
-    }
-
-    sfx = Mix_LoadWAV(filepath);
-    if (!sfx) {
-        printf("Failed to load effect: %s\n", Mix_GetError());
-        return;
-    }
-
-    Mix_VolumeChunk(sfx, volume);
-
-    // Play on fixed channel, this will stop any sound playing there
-    if (Mix_PlayChannel(EFFECT_CHANNEL, sfx, 0) == -1) {
-        printf("Failed to play effect: %s\n", Mix_GetError());
-    }
-}
-
-
-void cleanAudio() {
-    if (bgm) Mix_FreeMusic(bgm);
-    if (sfx) Mix_FreeChunk(sfx);
-    Mix_CloseAudio();
-    SDL_Quit();
-}
-Image TRUCK1,TRUCK2,CAR1,CAR2,ROCK,TRAIN,EAGLE,LILYPAD;
+Image TRUCK1, TRUCK2, CAR1, CAR2, ROCK, TRAIN, EAGLE, LILYPAD;
 
 typedef long long ll;
-enum CollitionType
+enum CollisionType
 {
     None,
     Drown,
@@ -94,14 +135,14 @@ enum CollitionType
     Eagle,
     Vehicle
 };
-CollitionType Collision = None;
+CollisionType Collision = None;
 enum Type
 {
     Street = 0,
     Water,
     Field
 };
-const int CAR_LEN = 2, TRUCK_LEN = 3, TRAIN_LEN = WIDTH / CELL * 2, LILYPOD = 1; // didn't add train bell, do it later. LEN should be atleast 1, as lilipod is 1
+const int CAR_LEN = 2, TRUCK_LEN = 3, TRAIN_LEN = WIDTH / CELL * 2, LILYPAD_LEN = 1; // didn't add train bell, do it later. LEN should be atleast 1, as lilipod is 1
 struct Bar
 {
     ll pos;
@@ -120,10 +161,10 @@ struct Line
 enum Motion
 {
 
-    Up ,
-    Down ,
-    Right ,
-    Left ,
+    Up,
+    Down,
+    Right,
+    Left,
     Dead
 };
 struct Player
@@ -131,17 +172,16 @@ struct Player
     int x, y;
     double px, py;
     Motion motion;
-    vector<Image> file = vector<Image>(5); 
+    vector<Image> file = vector<Image>(5);
     int frame_no;
     int timer_id;
-    
 };
 queue<Motion> keypress;
-const double base_factor=( /* 30 */30.0/ 20) * FPS;
-int vertical_scroll_factor=base_factor;
+const double base_factor = (/* 30 */ 30.0 / 20) * FPS;
+int vertical_scroll_factor = base_factor;
 
 ll TIME = 0;
-bool /* dontPush = false, */ isAnim = false,deathSound=false; // motion tells  verticalScroll to dont push player back, simulating player going forward without going beyond start_y
+bool /* dontPush = false, */ isAnim = false, deathSound = false; // motion tells  verticalScroll to dont push player back, simulating player going forward without going beyond start_y
 int onLog = 0;
 int TIME_id;
 int V;
@@ -150,11 +190,12 @@ int HScrollpx_dir, HScrollpx_Timer = -1;
 Line line[100 * ROW];
 int line_sz = 0;
 Player player;
-struct Eagle_{
-    
-    const int speed_ms=1000,fps=60;
-    double px, py=HEIGHT+CELL*4;
-    
+struct Eagle_
+{
+
+    const int speed_ms = 1000, fps = 60;
+    double px, py = HEIGHT + CELL * 4;
+
     int Timer = -1;
 };
 void EagleSpawn();
@@ -171,9 +212,9 @@ void Spawn(int line_i, bool isFirstLine);
 void verticalScroll();
 void horizontalScroll(int x);
 void draw_water(int i);
-void draw_field(int i );
+void draw_field(int i);
 void HScrollpx(); // called when player goes right or left
-void draw_street(int i,  bool bg_only);
+void draw_street(int i, bool bg_only);
 
 int upper_bound_increasing(int line_i, int x)
 {
