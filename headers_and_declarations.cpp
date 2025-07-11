@@ -15,17 +15,28 @@ const int ROW = 1.0 * HEIGHT / CELL;
 const int player_fps = 12;
 #define DEG(x) (x) * M_PI / 180
 #define SHADOW false
+#include <unordered_map>
+    #include <string>
+    #include <SDL.h>
+    #include <SDL_mixer.h>
+    #include <cstdio>
 #define SHADOW_COLOR 69, 69, 69
-#include <SDL.h>
-#include <SDL_mixer.h>
-#include <cstdio>
-
-
 namespace Audio
 {
+    
 
     Mix_Music *bgm = nullptr;
-    Mix_Chunk *sfx = nullptr;
+
+    std::unordered_map<int, Mix_Chunk*> sfxByChannelId;
+    std::unordered_map<int, int> realChannelByChannelId;
+
+    const int MUSIC_CHANNEL = -2;
+    const int ALL_CHANNELS = -1;
+/*
+    maps a random channel_id to a real SDL channel. 
+    So, you if you pass a channel_id already in use with a filepath , it will stop the previous sound and play the new one
+    Pass different channel_ids to play different sounds simultaneously.
+*/
     bool initAudio()
     {
         if (SDL_Init(SDL_INIT_AUDIO) < 0)
@@ -40,79 +51,170 @@ namespace Audio
         }
         return true;
     }
-    const int MUSIC_CHANNEL = -2;
-    // channel_id == -2 means "music"
-    void playAudio(int channel_id, bool loop, int volume, const char *filepath)
-    {
-        if (channel_id == Audio::MUSIC_CHANNEL)
-        {
-            if (bgm)
-            {
-                Mix_HaltMusic();
-                Mix_FreeMusic(bgm);
-                bgm = nullptr;
-            }
 
-            bgm = Mix_LoadMUS(filepath);
-            if (!bgm)
+    void playAudio(int channel_id, bool loop, int volume, const char *filepath=nullptr)
+{
+    if (channel_id == MUSIC_CHANNEL)
+    {
+        if (bgm)
+        {
+            Mix_HaltMusic();
+            Mix_FreeMusic(bgm);
+            bgm = nullptr;
+        }
+
+        if (!filepath)
+        {
+            printf("No filepath for music!\n");
+            return;
+        }
+
+        bgm = Mix_LoadMUS(filepath);
+        if (!bgm)
+        {
+            printf("Failed to load music: %s\n", Mix_GetError());
+            return;
+        }
+
+        Mix_VolumeMusic(volume);
+        if (Mix_PlayMusic(bgm, loop ? -1 : 1) == -1)
+        {
+            printf("Failed to play music: %s\n", Mix_GetError());
+        }
+    }
+    else
+    {
+        Mix_Chunk *chunk = nullptr;
+
+        if (filepath)
+        {
+            // New file → replace previous chunk
+            chunk = Mix_LoadWAV(filepath);
+            if (!chunk)
             {
-                printf("Failed to load music: %s\n", Mix_GetError());
+                printf("Failed to load: %s\n", Mix_GetError());
                 return;
             }
 
-            Mix_VolumeMusic(volume);
-            if (Mix_PlayMusic(bgm, loop ? -1 : 1) == -1)
+            // Free old chunk for this ID
+            auto old = sfxByChannelId.find(channel_id);
+            if (old != sfxByChannelId.end())
             {
-                printf("Failed to play music: %s\n", Mix_GetError());
+                Mix_FreeChunk(old->second);
+                sfxByChannelId.erase(old);
+            }
+
+            sfxByChannelId[channel_id] = chunk;
+
+            // Stop previous real channel if any
+            auto it = realChannelByChannelId.find(channel_id);
+            if (it != realChannelByChannelId.end())
+            {
+                Mix_HaltChannel(it->second);
             }
         }
         else
         {
-            if (sfx)
+            // No new filepath → reuse existing
+            auto it = sfxByChannelId.find(channel_id);
+            if (it == sfxByChannelId.end())
             {
-                Mix_FreeChunk(sfx);
-                sfx = nullptr;
-            }
-
-            sfx = Mix_LoadWAV(filepath);
-            if (!sfx)
-            {
-                printf("Failed to load effect: %s\n", Mix_GetError());
+                printf("No loaded sound for this channel ID and no filepath!\n");
                 return;
             }
+            chunk = it->second;
+        }
 
-            Mix_VolumeChunk(sfx, volume);
+        Mix_VolumeChunk(chunk, volume);
+        int loops = loop ? -1 : 0;
 
-            int loops = loop ? -1 : 0;
-            if (Mix_PlayChannel(channel_id, sfx, loops) == -1)
+        int real_channel;
+        auto it = realChannelByChannelId.find(channel_id);
+        if (it != realChannelByChannelId.end())
+        {
+            // Use the same real channel
+            real_channel = it->second;
+            Mix_HaltChannel(real_channel);  // Make sure to stop previous sound
+        }
+        else
+        {
+            // Pick a free channel
+            real_channel = Mix_PlayChannel(-1, chunk, loops);
+            if (real_channel == -1)
             {
-                printf("Failed to play chunk: %s\n", Mix_GetError());
+                printf("No free channel: %s\n", Mix_GetError());
+                return;
             }
+            realChannelByChannelId[channel_id] = real_channel;
+            return;
+        }
+
+        if (Mix_PlayChannel(real_channel, chunk, loops) == -1)
+        {
+            printf("Failed to play: %s\n", Mix_GetError());
         }
     }
-    const int ALL_CHANNELS = -1; 
+}
+
     void pauseAudio(int channel_id)
     {
-        if (channel_id == -2)
+        if (channel_id == MUSIC_CHANNEL)
         {
-            // Special: pause music
             Mix_PauseMusic();
+        }
+        else if (channel_id == ALL_CHANNELS)
+        {
+            Mix_Pause(-1);
         }
         else
         {
-            // Pause a specific channel (or all if you pass -1)
-            Mix_Pause(channel_id);
+            auto it = realChannelByChannelId.find(channel_id);
+            if (it != realChannelByChannelId.end())
+            {
+                Mix_Pause(it->second);
+            }
         }
     }
+
     void resumeAudio(int channel_id)
     {
-        if (channel_id == Audio::MUSIC_CHANNEL)
+        if (channel_id == MUSIC_CHANNEL)
         {
             Mix_ResumeMusic();
         }
+        else if (channel_id == ALL_CHANNELS)
+        {
+            Mix_Resume(-1);
+        }
         else
         {
-            Mix_Resume(channel_id);
+            auto it = realChannelByChannelId.find(channel_id);
+            if (it != realChannelByChannelId.end())
+            {
+                Mix_Resume(it->second);
+            }
+        }
+    }
+
+    void stopAudio(int channel_id)
+    {
+        if (channel_id == MUSIC_CHANNEL)
+        {
+            Mix_HaltMusic();
+        }
+        else if (channel_id == ALL_CHANNELS)
+        {
+            Mix_HaltChannel(-1);
+            realChannelByChannelId.clear(); // Clear mappings too
+        }
+        else
+        {
+            auto it = realChannelByChannelId.find(channel_id);
+            if (it != realChannelByChannelId.end())
+            {
+                Mix_HaltChannel(it->second);
+                realChannelByChannelId.erase(it);
+            }
         }
     }
 
@@ -120,12 +222,18 @@ namespace Audio
     {
         if (bgm)
             Mix_FreeMusic(bgm);
-        if (sfx)
-            Mix_FreeChunk(sfx);
+        for (auto &p : sfxByChannelId)
+            Mix_FreeChunk(p.second);
+
+        sfxByChannelId.clear();
+        realChannelByChannelId.clear();
+
         Mix_CloseAudio();
         SDL_Quit();
     }
 }
+
+
 Image TRUCK1, TRUCK2, CAR1, CAR2, ROCK, TRAIN, EAGLE, LILYPAD;
 
 
