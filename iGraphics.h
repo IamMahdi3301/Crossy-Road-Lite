@@ -112,7 +112,7 @@ void iMouseWheel(int dir, int x, int y);
 #define sswap(a, b)           \
     do                        \
     {                         \
-        typeof(a) temp = (a); \
+        auto temp = (a); \
         (a) = (b);            \
         (b) = temp;           \
     } while (0)
@@ -1130,7 +1130,10 @@ void iLoadFramesFromFolder2(Image *frames, const char *folderPath, int ignoreCol
             continue;
 
         // Optionally filter image files (uncomment if needed)
-        filenames[count] = strdup(name);
+        filenames[count] = (char *)malloc(strlen(name) + 1);
+        if (filenames[count]) {
+            strcpy(filenames[count], name);
+        }
         if (filenames[count] != NULL)
             count++;
     }

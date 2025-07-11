@@ -1,6 +1,7 @@
-#include <bits/stdc++.h>
+#include <vector>
+#include<queue>
+#include<string>
 
-using namespace std;
 #define SLOPE 0.2679491924
 #include "iGraphics.h"
 #define HEIGHT /* 800 */ 1024
@@ -126,7 +127,7 @@ namespace Audio
 }
 Image TRUCK1, TRUCK2, CAR1, CAR2, ROCK, TRAIN, EAGLE, LILYPAD;
 
-typedef long long ll;
+
 enum CollisionType
 {
     None,
@@ -145,18 +146,17 @@ enum Type
 const int CAR_LEN = 2, TRUCK_LEN = 3, TRAIN_LEN = WIDTH / CELL * 2, LILYPAD_LEN = 1; // didn't add train bell, do it later. LEN should be atleast 1, as lilipod is 1
 struct Bar
 {
-    ll pos;
+    int pos;
     double pospx;
     int size;
 };
-const int MAX_DATA_SIZE = 200;
+
 struct Line
 {
     Type type;
     int dir;
     int speed_factor;
-    int data_sz;
-    Bar data[MAX_DATA_SIZE];
+    std::vector<Bar> data;
 };
 enum Motion
 {
@@ -172,23 +172,33 @@ struct Player
     int x, y;
     double px, py;
     Motion motion;
-    vector<Image> file = vector<Image>(5);
+    std::vector<Image> file = std::vector<Image>(5);
     int frame_no;
-    int timer_id;
+    
 };
-queue<Motion> keypress;
-const double base_factor = (/* 30 */ 30.0 / 20) * FPS;
-int vertical_scroll_factor = base_factor;
+std::queue<Motion> keypress;
+namespace Vertical
+{
+    const double base_factor = ( 30.0 / 20) * FPS;
+    int scroll_factor = base_factor;
+    void scroll();
+}
 
-ll TIME = 0;
-bool /* dontPush = false, */ isAnim = false, deathSound = false; // motion tells  verticalScroll to dont push player back, simulating player going forward without going beyond start_y
+
+namespace Timer
+{
+    int HScrollpx=-1,Eagle=-1,stopwatch=-1,player=-1;
+    
+}
+int TIME = 0;
+bool /* dontPush = false, */ isAnim = false, deathSound = false; 
 int onLog = 0;
-int TIME_id;
+
 int V;
 int Hpx = 0; // when player moves left or right
-int HScrollpx_dir, HScrollpx_Timer = -1;
-Line line[100 * ROW];
-int line_sz = 0;
+int HScrollpx_dir;
+std::vector<Line> line;
+
 Player player;
 struct Eagle_
 {
@@ -196,53 +206,58 @@ struct Eagle_
     const int speed_ms = 1000, fps = 60;
     double px, py = HEIGHT + CELL * 4;
 
-    int Timer = -1;
 };
 void EagleSpawn();
 
 Eagle_ eagle;
-void spawn_street(int line_i);
-void spawn_field(int line_i);
-void spawn_water(int line_i);
+namespace Spawn
+{
+    void street(int line_i);
+    void field(int line_i);
+    void water(int line_i);
+    void all(int line_i, bool isFirstLine);
+}
+
 void iDraw();
 void motion();
 void stopwatch();
 bool collision(int line_i);
-void Spawn(int line_i, bool isFirstLine);
-void verticalScroll();
+namespace Draw
+{
+    
+    void street(int i, bool bg_only);
+    void water(int i);
+    void field(int i);
+    
+}
+
 void horizontalScroll(int x);
-void draw_water(int i);
-void draw_field(int i);
 void HScrollpx(); // called when player goes right or left
-void draw_street(int i, bool bg_only);
 
-int upper_bound_increasing(int line_i, int x)
-{
-    int low = 0, high = line[line_i].data_sz;
-    while (low < high)
-    {
-        int mid = (low + high) / 2;
-        if (line[line_i].data[mid].pos <= x)
-            low = mid + 1;
-        else
-            high = mid;
-    }
-    return low;
-}
 
-int upper_bound_decreasing(int line_i, int x)
+struct greater
 {
-    int low = 0, high = line[line_i].data_sz;
-    while (low < high)
+    bool operator()(const Bar &a, const int &b) const
     {
-        int mid = (low + high) / 2;
-        if (line[line_i].data[mid].pos >= x)
-            low = mid + 1;
-        else
-            high = mid;
+        return a.pos > b;
     }
-    return low;
-}
+    bool operator()(const int &a, const Bar &b) const
+    {
+        return a > b.pos;
+    }
+};
+struct less
+{
+    bool operator()(const Bar &a, const int &b) const
+    {
+        return a.pos < b;
+    }
+    bool operator()(const int &a, const Bar &b) const
+    {
+        return a < b.pos;
+    }
+};
+
 
 void drawCoordinateAxes(double gap = 50.0, int r = 0, int g = 0, int b = 0)
 {
@@ -275,45 +290,3 @@ void drawCoordinateAxes(double gap = 50.0, int r = 0, int g = 0, int b = 0)
     }
 }
 
-void merge(int line_i, int l, int m, int r)
-{ // as all lilypods are of same size, dont bother to sort line[line_i].data[l + i].size
-    int n1 = m - l + 1, n2 = r - m;
-    int L[n1], R[n2];
-    for (int i = 0; i < n1; ++i)
-        L[i] = line[line_i].data[l + i].pos;
-    for (int j = 0; j < n2; ++j)
-        R[j] = line[line_i].data[m + 1 + j].pos;
-    int i = 0, j = 0, k = l;
-    while (i < n1 && j < n2)
-        line[line_i].data[k++].pos = (L[i] <= R[j]) ? L[i++] : R[j++];
-    while (i < n1)
-        line[line_i].data[k++].pos = L[i++];
-    while (j < n2)
-        line[line_i].data[k++].pos = R[j++];
-}
-void mergeSort(int line_i, int l, int r)
-{
-    if (l < r)
-    {
-        int m = l + (r - l) / 2;
-        mergeSort(line_i, l, m);
-        mergeSort(line_i, m + 1, r);
-        merge(line_i, l, m, r);
-    }
-}
-
-bool binary_search(int line_i, int x)
-{
-    int low = 0, high = line[line_i].data_sz - 1;
-    while (low <= high)
-    {
-        int mid = (low + high) / 2;
-        if (line[line_i].data[mid].pos == x)
-            return true;
-        else if (line[line_i].data[mid].pos < x)
-            low = mid + 1;
-        else
-            high = mid - 1;
-    }
-    return false;
-}
