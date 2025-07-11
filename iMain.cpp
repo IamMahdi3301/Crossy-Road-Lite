@@ -15,17 +15,17 @@ add train bell sound
 void Draw::water(int i)
 {
     std::vector<double> x = {(double)0, (double)WIDTH, (double)WIDTH, 0.0};
-    std::vector<double> y = {(double)(CELL * i - 1.0 * V * CELL / Vertical::scroll_factor), (double)(CELL * i - 1.0 * V * CELL / Vertical::scroll_factor - SLOPE * x[1]), (double)(CELL * i - 1.0 * V * CELL / Vertical::scroll_factor + CELL - SLOPE * x[2]), (double)(CELL * i - 1.0 * V * CELL / Vertical::scroll_factor + CELL)};
+    std::vector<double> y = {(double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor), (double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor - SLOPE * x[1]), (double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor + CELL - SLOPE * x[2]), (double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor + CELL)};
     iSetColor(99, 227, 255);
 
     iFilledPolygon(x.data(), y.data(), 4);
     for (auto &data : line[i].data)
     {
         int length = data.size * CELL;
-        int pos_x = data.pospx + 1.0 * Hpx * CELL / player_fps;
+        int pos_x = data.pospx + 1.0 * Horizontal::H * CELL / player_fps;
         if (line[i].dir == 1)
             pos_x = pos_x - length;
-        int pos_y = CELL * i - 1.0 * V * CELL / Vertical::scroll_factor;
+        int pos_y = CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor;
 
         if (data.size == LILYPAD_LEN)
             iSetColor(70, 101, 56);
@@ -57,17 +57,17 @@ void Draw::water(int i)
 void Draw::field(int i)
 {
     std::vector<double> x = {(double)0, (double)WIDTH, (double)WIDTH, 0.0};
-    std::vector<double> y = {(double)(CELL * i - 1.0 * V * CELL / Vertical::scroll_factor), (double)(CELL * i - 1.0 * V * CELL / Vertical::scroll_factor - SLOPE * x[1]), (double)(CELL * i - 1.0 * V * CELL / Vertical::scroll_factor + CELL - SLOPE * x[2]), (double)(CELL * i - 1.0 * V * CELL / Vertical::scroll_factor + CELL)};
+    std::vector<double> y = {(double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor), (double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor - SLOPE * x[1]), (double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor + CELL - SLOPE * x[2]), (double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor + CELL)};
     iSetColor(154, 172, 59);
 
     iFilledPolygon(x.data(), y.data(), 4);
     for (auto &data : line[i].data)
     {
         int length = CELL;
-        int pos_x = data.pospx + 1.0 * Hpx * CELL / player_fps;
+        int pos_x = data.pospx + 1.0 * Horizontal::H * CELL / player_fps;
         if (line[i].dir == 1)
             pos_x = pos_x - length;
-        int pos_y = CELL * i - 1.0 * V * CELL / Vertical::scroll_factor;
+        int pos_y = CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor;
 
         if (data.size == 0)
         {
@@ -110,7 +110,7 @@ void Draw::street(int i, bool bg_only = false)
 {
 
     std::vector<double> x = {(double)0, (double)WIDTH, (double)WIDTH, 0.0};
-    std::vector<double> y = {(double)(CELL * i - 1.0 * V * CELL / Vertical::scroll_factor), (double)(CELL * i - 1.0 * V * CELL / Vertical::scroll_factor - SLOPE * x[1]), (double)(CELL * i - 1.0 * V * CELL / Vertical::scroll_factor + CELL - SLOPE * x[2]), (double)(CELL * i - 1.0 * V * CELL / Vertical::scroll_factor + CELL)};
+    std::vector<double> y = {(double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor), (double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor - SLOPE * x[1]), (double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor + CELL - SLOPE * x[2]), (double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor + CELL)};
     iSetColor(66, 68, 71);
     if (bg_only)
     {
@@ -121,7 +121,7 @@ void Draw::street(int i, bool bg_only = false)
             iSetColor(110, 65, 67);
             for (int i = 0; i < WIDTH / CELL; i += 2)
 
-                iLine(i * CELL + 1.0 * Hpx * CELL / player_fps, y[0] - (i * CELL + 1.0 * Hpx * CELL / player_fps) * SLOPE, i * CELL + 1.0 * Hpx * CELL / player_fps + 20, y[3] - (20 + i * CELL + 1.0 * Hpx * CELL / player_fps) * SLOPE);
+                iLine(i * CELL + 1.0 * Horizontal::H * CELL / player_fps, y[0] - (i * CELL + 1.0 * Horizontal::H * CELL / player_fps) * SLOPE, i * CELL + 1.0 * Horizontal::H * CELL / player_fps + 20, y[3] - (20 + i * CELL + 1.0 * Horizontal::H * CELL / player_fps) * SLOPE);
 
             iSetColor(44, 40, 49);
 
@@ -139,10 +139,10 @@ void Draw::street(int i, bool bg_only = false)
 
     {
         int length = data.size * CELL;
-        int pos_x = data.pospx + 1.0 * Hpx * CELL / player_fps;
+        int pos_x = data.pospx + 1.0 * Horizontal::H * CELL / player_fps;
         if (line[i].dir == 1)
             pos_x = pos_x - length;
-        int pos_y = CELL * i - 1.0 * V * CELL / Vertical::scroll_factor;
+        int pos_y = CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor;
         x.clear();
         y.clear();
         x.insert(x.end(), {(double)pos_x, (double)(pos_x + length), (double)(pos_x + length), (double)pos_x});
@@ -283,7 +283,7 @@ void Spawn::water(int line_i)
         }
     }
 }
-void HScrollpx()
+void Horizontal::scrollpx()
 {
 
     static int cnt = 0;
@@ -291,21 +291,20 @@ void HScrollpx()
     player.frame_no = cnt;
     if (cnt == 0)
         iPauseTimer(Timer::HScrollpx);
-    if (HScrollpx_dir > 0)
+    if (Horizontal::scrollpx_dir > 0)
     {
         if (cnt == 0)
+            Horizontal::scroll(1);
 
-            horizontalScroll(1);
-
-        Hpx = (Hpx + 1) % player_fps;
+        Horizontal::H = (Horizontal::H + 1) % player_fps;
     }
     else
     {
         if (cnt == 0)
 
-            horizontalScroll(-1);
+            Horizontal::scroll(-1);
 
-        Hpx = (Hpx - 1) % player_fps;
+        Horizontal::H = (Horizontal::H - 1) % player_fps;
     }
 }
 
@@ -340,7 +339,7 @@ void motion()
         }
         if (player.x + 1 >= WIDTH / (CELL)-1) // also change in collion() if needed
         {
-            HScrollpx_dir = -1;
+            Horizontal::scrollpx_dir = -1;
 
             iResumeTimer(Timer::HScrollpx);
 
@@ -361,7 +360,7 @@ void motion()
         }
         if (player.x - 1 < 1) // also change in collision()
         {
-            HScrollpx_dir = 1;
+            Horizontal::scrollpx_dir = 1;
 
             iResumeTimer(Timer::HScrollpx);
             reset();
@@ -402,7 +401,7 @@ void motion()
     if (cnt == 0)
     {
         keypress.pop();
-        player.py = player.y * CELL - 1.0 * (V * CELL) / Vertical::scroll_factor;
+        player.py = player.y * CELL - 1.0 * (Vertical::V * CELL) / Vertical::scroll_factor;
         player.px = player.x * CELL;
     }
     player.frame_no = cnt;
@@ -413,14 +412,14 @@ void stopwatch()
     TIME = (TIME + 1LL) % INT32_MAX;
     if (!Collision)
     {
-        V = (V + 1) % Vertical::scroll_factor;
+        Vertical::V = (Vertical::V + 1) % Vertical::scroll_factor;
 
         player.py -= 1.0 * CELL / Vertical::scroll_factor;
 
-        if (V == 0)
+        if (Vertical::V == 0)
             Vertical::scroll();
     }
-    horizontalScroll(0);
+    Horizontal::scroll(0);
 }
 
 bool collision(int line_i)
@@ -560,7 +559,7 @@ bool collision(int line_i)
     return false; // to suppress warning
 }
 
-void Spawn::all(int line_i, bool isFirstLine)
+void Spawn::all(int line_i, bool isFirstLine=false)
 {
     int rnd = rand() % 9;
     if (isFirstLine)
@@ -576,13 +575,13 @@ void Vertical::scroll()
 {
     for (int i = 0; i < line.size() - 1; i++)
         line[i] = line[i + 1];
-    Spawn::all(line.size() - 1, false);
+    Spawn::all(line.size() - 1);
 
     player.y--;
-    V = 0;
+    Vertical::V = 0;
     Vertical::scroll_factor = 2 * (base_factor) / player.y;
 }
-void horizontalScroll(int x)
+void Horizontal::scroll(int x)
 {
 
     if (x == 0)
@@ -632,7 +631,7 @@ void iDraw()
 
     if (Collision)
     {
-        player.py = player.y * CELL - 1.0 * (V * CELL) / Vertical::scroll_factor;
+        player.py = player.y * CELL - 1.0 * (Vertical::V * CELL) / Vertical::scroll_factor;
         player.px = player.x * CELL;
         std::string collision_msg[] = {
             "None",
@@ -805,7 +804,7 @@ int main(int argc, char *argv[])
     player.px = CELL * player.x;
     player.py = CELL * start_y;
     line.resize(ROW + 6);
-    
+
     for (int i = 0; i < line.size(); i++)
     {
         Spawn::all(i, (i <= start_y + 3 ? true : false));
@@ -815,7 +814,7 @@ int main(int argc, char *argv[])
 
     Audio::playAudio(Audio::MUSIC_CHANNEL, true, MIX_MAX_VOLUME, "assets\\sounds\\traffic075x.ogg");
     Timer::stopwatch = iSetTimer(1000 / FPS, stopwatch);
-    Timer::HScrollpx = iSetTimer(std::max(1.0, PLAYER_SPEED / 10.0), HScrollpx);
+    Timer::HScrollpx = iSetTimer(std::max(1.0, PLAYER_SPEED / 10.0), Horizontal::scrollpx);
     iPauseTimer(Timer::HScrollpx);
     Timer::player = iSetTimer(PLAYER_SPEED / (player_fps), motion);
     iOpenWindow(WIDTH, HEIGHT, "Crossy Road Lite");

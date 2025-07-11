@@ -181,6 +181,7 @@ namespace Vertical
 {
     const double base_factor = ( 30.0 / 20) * FPS;
     int scroll_factor = base_factor;
+    int V;
     void scroll();
 }
 
@@ -194,9 +195,8 @@ int TIME = 0;
 bool /* dontPush = false, */ isAnim = false, deathSound = false; 
 int onLog = 0;
 
-int V;
-int Hpx = 0; // when player moves left or right
-int HScrollpx_dir;
+
+
 std::vector<Line> line;
 
 Player player;
@@ -230,9 +230,14 @@ namespace Draw
     void field(int i);
     
 }
+namespace Horizontal
+{
+    int H = 0; // when player moves left or right
+    int scrollpx_dir;
+    void scroll(int x);
+    void scrollpx(); // called when player goes right or left
+}
 
-void horizontalScroll(int x);
-void HScrollpx(); // called when player goes right or left
 
 
 struct greater
