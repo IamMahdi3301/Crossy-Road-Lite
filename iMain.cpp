@@ -691,6 +691,7 @@ void iDraw()
                 std::string str;
                 int rnd = rand() % 5;
                 sprintf((char *)str.c_str(), "assets\\sounds\\cluck%d.wav", (rnd < 1 ? 0 : 1));
+                
                 Audio::playAudio(2, false, 20, str.c_str());
             }
 
@@ -813,6 +814,7 @@ int main(int argc, char *argv[])
     player.motion = Up;
 
     Audio::playAudio(Audio::MUSIC_CHANNEL, true, MIX_MAX_VOLUME, "assets\\sounds\\traffic075x.ogg");
+    
     Timer::stopwatch = iSetTimer(1000 / FPS, stopwatch);
     Timer::HScrollpx = iSetTimer(std::max(1.0, PLAYER_SPEED / 10.0), Horizontal::scrollpx);
     iPauseTimer(Timer::HScrollpx);

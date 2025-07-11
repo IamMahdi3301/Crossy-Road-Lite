@@ -4,12 +4,12 @@
 
 #define SLOPE 0.2679491924
 #include "iGraphics.h"
-#define HEIGHT /* 800 */ 1024
-#define WIDTH /* 1000 */ 1000
-#define CELL 50 // factor of 10, make objects like cars, logs with slightly less height for better visibility
+#define HEIGHT  1024
+#define WIDTH  1000
+#define CELL 50 // multiple of 10
 const int ROW = 1.0 * HEIGHT / CELL;
 #define start_y 4
-#define max_y /* 10 */ 100
+
 #define FPS 60
 #define PLAYER_SPEED 120 // ms
 const int player_fps = 12;
@@ -23,6 +23,7 @@ const int player_fps = 12;
 
 namespace Audio
 {
+
     Mix_Music *bgm = nullptr;
     Mix_Chunk *sfx = nullptr;
     bool initAudio()
@@ -264,7 +265,7 @@ struct less
 };
 
 
-void drawCoordinateAxes(double gap = 50.0, int r = 0, int g = 0, int b = 0)
+void drawCoordinateAxes(double gap = CELL, int r = 0, int g = 0, int b = 0)
 {
     iSetColor(r, g, b);
 
