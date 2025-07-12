@@ -16,8 +16,7 @@ void Draw::water(int i)
 {
     std::vector<double> x = {(double)0, (double)WIDTH, (double)WIDTH, 0.0};
     std::vector<double> y = {(double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor), (double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor - SLOPE * x[1]), (double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor + CELL - SLOPE * x[2]), (double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor + CELL)};
-    iSetColor(99, 227, 255);
-
+    iSetColor(water_bg.r,water_bg.g,water_bg.b);
     iFilledPolygon(x.data(), y.data(), 4);
     for (auto &data : line[i].data)
     {
@@ -27,10 +26,8 @@ void Draw::water(int i)
             pos_x = pos_x - length;
         int pos_y = CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor;
 
-        if (data.size == LILYPAD_LEN)
-            iSetColor(70, 101, 56);
-        else
-            iSetColor(39, 13, 8);
+        if (data.size != LILYPAD_LEN)
+            iSetColor(log.r,log.g,log.b);
         x.clear();
         y.clear();
         x.insert(x.end(), {(double)pos_x, (double)(pos_x + length), (double)(pos_x + length), (double)pos_x});
@@ -44,10 +41,8 @@ void Draw::water(int i)
         std::vector<double> y3 = {y1[3] - 10, y1[2] - 10, y1[2], y1[3]};
         if (data.size != LILYPAD_LEN)
             iFilledPolygon(x3.data(), y3.data(), 4);
-        if (data.size == LILYPAD_LEN)
-            iSetColor(70, 101, 56);
-        else
-            iSetColor(81, 41, 34);
+        if (data.size != LILYPAD_LEN)
+            iSetColor(log_top.r,log_top.g,log_top.b);
         if (data.size != LILYPAD_LEN)
             iFilledPolygon(x1.data(), y1.data(), 4);
         if (data.size == LILYPAD_LEN)
@@ -58,7 +53,7 @@ void Draw::field(int i)
 {
     std::vector<double> x = {(double)0, (double)WIDTH, (double)WIDTH, 0.0};
     std::vector<double> y = {(double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor), (double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor - SLOPE * x[1]), (double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor + CELL - SLOPE * x[2]), (double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor + CELL)};
-    iSetColor(154, 172, 59);
+    iSetColor(field_bg.r,field_bg.g,field_bg.b);
 
     iFilledPolygon(x.data(), y.data(), 4);
     for (auto &data : line[i].data)
@@ -81,28 +76,29 @@ void Draw::field(int i)
         std::vector<double> x = {(double)(pos_x + CELL / 2.0 - 10), (double)(pos_x + CELL / 2.0 + 10), (double)(pos_x + CELL / 2.0 + 10), (double)(pos_x + CELL / 2.0 - 10)};
         std::vector<double> y = {(double)(pos_y + 5 - SLOPE * x[0]), (double)(pos_y + 5 - SLOPE * x[1]), (double)(pos_y + 5 + CELL / 2.0 - SLOPE * x[2]), (double)(pos_y + 5 + CELL / 2.0 - SLOPE * x[3])};
 
-        iFilledPolygon(x.data(), y.data(), 4);
+        /* iFilledPolygon(x.data(), y.data(), 4); */
         iSetColor(157, 79, 66);
         std::vector<double> x2 = {x[0] + 20, x[1] + 5, x[2] + 5, x[3] + 20};
         std::vector<double> y2 = {(double)(y[1] + SLOPE2 * (x2[0] - x[1])), (double)(y[1] + SLOPE2 * (x2[1] - x[1])), (double)(y[1] + CELL / 2.0 + SLOPE2 * (x2[2] - x[1])), (double)(y[1] + CELL / 2.0 + SLOPE2 * (x2[3] - x[1]))};
-        iFilledPolygon(x2.data(), y2.data(), 4);
+        /* iFilledPolygon(x2.data(), y2.data(), 4); */
         // leaves
         iSetColor(83, 90, 34);
         int height = data.size;
         std::vector<double> x1 = {(double)(pos_x + 10), (double)(pos_x + length - 10), (double)(pos_x + length - 10), (double)(pos_x + 10)};
         std::vector<double> y1 = {(double)(pos_y + CELL / 2.0 - SLOPE * x1[0]), (double)(pos_y + CELL / 2.0 - SLOPE * x1[1]), (double)(pos_y + CELL / 2.0 + CELL * height - SLOPE * x1[2]), (double)(pos_y + CELL / 2.0 + CELL * height - SLOPE * x1[3])};
 
-        iFilledPolygon(x1.data(), y1.data(), 4);
+        /* iFilledPolygon(x1.data(), y1.data(), 4); */
         iSetColor(35, 39, 14);
         std::vector<double> x3 = {(double)(x1[1]), (double)(x1[1] + 10), (double)(x1[1] + 10), (double)(x1[1])};
         std::vector<double> y3 = {(double)(y1[1] + SLOPE2 * (x3[0] - x1[1])), (double)(y1[1] + SLOPE2 * (x3[1] - x1[1])), (double)(y1[1] + CELL * height + SLOPE2 * (x3[2] - x1[1])), (double)(y1[1] + CELL * height + SLOPE2 * (x3[3] - x1[1]))};
-        iFilledPolygon(x3.data(), y3.data(), 4);
+        /* iFilledPolygon(x3.data(), y3.data(), 4); */
         // treetop
         iSetColor(199, 216, 80);
+        iShowLoadedImage(round(x[0]-CELL/2.0),round(y[0]-CELL/5.0),&TREE[height-1]);
 
         std::vector<double> x4 = {x1[3], x1[2], x3[2], x3[2] - (x1[2] - x1[3])};
         std::vector<double> y4 = {y1[3], y1[2], y3[2], (double)(y1[3] + SLOPE2 * (x4[3] - x4[0]))};
-        iFilledPolygon(x4.data(), y4.data(), 4);
+        /* iFilledPolygon(x4.data(), y4.data(), 4); */
     }
 }
 
@@ -170,40 +166,40 @@ void Draw::street(int i, bool bg_only = false)
 }
 void Spawn::street(int line_i)
 {
-    int rnd = rand() % 10;
+    int rnd = ranint(0, 10);
     int dir = line[line_i].dir = (rnd % 2 == 0 ? 1 : -1);
     line[line_i].type = Street;
     line[line_i].data.clear();
-    line[line_i].data.resize(25 + rand() % 75);
+    line[line_i].data.resize(ranint(25, 100));
 
     if (rnd < 2)
     {
-        line[line_i].speed_factor = std::max(1.0, (1 + rand() % 3) * FPS / 60.0);
+        line[line_i].speed_factor = std::max(1.0, (1 + ranint(0, 3)) * FPS / 60.0);
 
-        int pos = (rand() % (TRAIN_LEN * 3)) * dir;
+        int pos = (ranint(0, (TRAIN_LEN * 3))) * dir;
         for (int i = 0; i < line[line_i].data.size(); i++)
         {
             line[line_i].data[i] = {pos, (double)pos * CELL, TRAIN_LEN};
-            pos += -dir * (TRAIN_LEN * (5 + rand() % 5) + rand() % 6);
+            pos += -dir * (TRAIN_LEN * (ranint(5, 10)) + ranint(0, 6));
         }
     }
     else
     {
-        line[line_i].speed_factor = std::max(1.0, (4 + rand() % 3) * FPS / 20.0);
-        int pos = (dir == -1 ? WIDTH / CELL + rand() % 4 : -rand() % std::max(1, (WIDTH / CELL + 4))); // necessary?or just any rand()?
+        line[line_i].speed_factor = std::max(1.0, (4 + ranint(0, 3)) * FPS / 20.0);
+        int pos = (dir == -1 ? WIDTH / CELL + ranint(0, 4) : -ranint(0, std::max(1, (WIDTH / CELL + 4)))); // necessary?or just any rand()?
 
         for (int i = 0; i < line[line_i].data.size(); i++)
         {
-            int type = rand() % 2;
+            int type = ranint(0, 2);
             if (type == 0)
             {
                 line[line_i].data[i] = {pos, (double)pos * CELL, CAR_LEN};
-                pos += -dir * (CAR_LEN * (4 + rand() % 2) + rand() % 3);
+                pos += -dir * (CAR_LEN * (ranint(4, 6)) + ranint(0, 3));
             }
             else
             {
                 line[line_i].data[i] = {pos, (double)pos * CELL, TRUCK_LEN};
-                pos += -dir * (TRUCK_LEN * (4 + rand() % 2) + rand() % 3);
+                pos += -dir * (TRUCK_LEN * ranint(4, 6) + ranint(0, 3));
             }
         }
     }
@@ -215,71 +211,71 @@ void Spawn::field(int line_i)
     line[line_i].dir = 0;
     line[line_i].type = Field;
     line[line_i].data.clear();
-    line[line_i].data.resize(25 + rand() % 75);
+    line[line_i].data.resize(ranint(25,100));
 
     line[line_i].speed_factor = 1; // to avoid dividing by zero in future
 
-    int pos = WIDTH / (2 * CELL) - 1 - rand() % 3;
+    int pos = WIDTH / (2 * CELL) - 1 - ranint(0, 3);
     for (int j = line[line_i].data.size() / 2 - 1; j >= 0; j--)
     {
-        line[line_i].data[j] = {pos, (double)pos * CELL, rand() % 3}; // tree height in size.0 means rock
+        line[line_i].data[j] = {pos, (double)pos * CELL, ranint(0, 4)}; // tree height in size.0 means rock
         if (pos == player.x)
             j++;
 
-        pos -= (4 + rand() % 6);
+        pos -= (ranint(4,10));
     }
 
     pos = WIDTH / (2 * CELL);
     int i;
     for (i = line[line_i].data.size() / 2; i < line[line_i].data.size(); i++)
     {
-        line[line_i].data[i] = {pos, (double)pos * CELL, rand() % 3};
+        line[line_i].data[i] = {pos, (double)pos * CELL, ranint(0, 4)};
         if (pos == player.x)
             i--;
 
-        pos += 4 + rand() % 6;
+        pos += ranint(4,10);
     }
 }
 void Spawn::water(int line_i)
 {
     line[line_i].type = Water;
-    int dir = line[line_i].dir = (rand() % 2 == 0 ? 1 : -1);
+    int dir = line[line_i].dir = (ranint(0, 2) == 0 ? 1 : -1);
     if (line_i > 0 && line[line_i - 1].type == Water && line[line_i - 1].dir == dir)
-        line[line_i].speed_factor = std::max(std::max(2.0, (5 + rand() % 4) * FPS / 20.0), (FPS / 20.0) * (line[line_i].speed_factor - 1 - rand() % 3));
+        line[line_i].speed_factor = std::max(std::max(2.0, ( ranint(5, 9)) * FPS / 20.0), (FPS / 20.0) * (line[line_i].speed_factor - 1 - ranint(0, 3)));
     else
-        line[line_i].speed_factor = std::max(2.0, (5 + rand() % 4) * FPS / 20.0);
+        line[line_i].speed_factor = std::max(2.0, (ranint(5,9)) * FPS / 20.0);
     line[line_i].data.clear();
-    line[line_i].data.resize(25 + rand() % 75);
-    int rnd = rand() % 7;
+    line[line_i].data.resize(ranint(25,100));
+    int rnd = ranint(0, 7);
     if (rnd > 1 || (line_i > 0 && line[line_i - 1].type == Water && line[line_i - 1].dir == 0)) // if prev is lilipod, then current cant be lilipod
     {
 
-        int pos = rand() % (WIDTH / CELL);
+        int pos = ranint(0, WIDTH / CELL);
 
         for (int i = 0; i < line[line_i].data.size(); i++)
         {
 
-            int len = CAR_LEN + (rand() % 2) * CAR_LEN;
+            int len = CAR_LEN + (ranint(0, 2)) * CAR_LEN;
             line[line_i].data[i] = {pos, (double)pos * CELL, len};
-            pos += -dir * (len + 2 + rand() % 3);
+            pos += -dir * (len + 2 + ranint(0, 3));
         }
     }
     else
     {
         line[line_i].dir = 0;
 
-        int pos = WIDTH / (2 * CELL) - 1 - rand() % 3;
+        int pos = WIDTH / (2 * CELL) - 1 - ranint(0, 3);
         for (int j = line[line_i].data.size() / 2 - 1; j >= 0; j--)
         {
             line[line_i].data[j] = {pos, (double)pos * CELL, LILYPAD_LEN};
-            pos -= (4 * LILYPAD_LEN + rand() % 5);
+            pos -= (4 * LILYPAD_LEN + ranint(0, 5));
         }
         pos = WIDTH / (2 * CELL);
         int i;
         for (i = line[line_i].data.size() / 2; i < line[line_i].data.size(); i++)
         {
             line[line_i].data[i] = {pos, (double)pos * CELL, LILYPAD_LEN};
-            pos += 4 * LILYPAD_LEN + rand() % 5;
+            pos += 4 * LILYPAD_LEN + ranint(0, 5);
         }
     }
 }
@@ -561,7 +557,7 @@ bool collision(int line_i)
 
 void Spawn::all(int line_i, bool isFirstLine=false)
 {
-    int rnd = rand() % 9;
+    int rnd = ranint(0, 9);
     if (isFirstLine)
         rnd = 3;
     if (rnd >= 4)
@@ -680,7 +676,7 @@ void iDraw()
             Draw::field(i);
         if (i == player.y && Collision && !deathSound && Collision != Eagle)
         {
-            Audio::playAudio(2, false, 35, "assets\\sounds\\death.wav");
+            Audio::playAudio(2, false, 35,resources[resource_id].second[2].c_str());
             deathSound = 1;
         }
         if (i == player.y && Collision != Drown && eagle.py >= player.py - CELL)
@@ -688,11 +684,11 @@ void iDraw()
 
             if (player.frame_no == 1)
             {
-                std::string str;
-                int rnd = rand() % 5;
-                sprintf((char *)str.c_str(), "assets\\sounds\\cluck%d.wav", (rnd < 1 ? 0 : 1));
                 
-                Audio::playAudio(2, false, 20, str.c_str());
+                int rnd = ranint(0,5);
+               
+                
+                Audio::playAudio(2, false, 20, resources[resource_id].second[rnd < 1 ? 0 : 1].c_str());
             }
 
             iShowLoadedImage((int)player.px, (int)(player.py - SLOPE * player.px) + (int)(9 * (player.frame_no <= (int)round(player_fps / 2.0) ? player.frame_no : player_fps - player.frame_no)), &player.file[player.motion]);
@@ -773,39 +769,26 @@ void EagleSpawn()
     {
         if (!deathSound)
         {
-            Audio::playAudio(2, false, 35, "assets\\sounds\\death.wav");
+            Audio::playAudio(2, false, 35, resources[resource_id].second[2].c_str());
             deathSound = 1;
         }
     }
 }
-void Load_Image()
-{
-    iLoadImage(&TRUCK1, "assets\\images\\truck1.png");
-    iLoadImage(&TRUCK2, "assets/images/truck2.png");
-    iLoadImage(&CAR1, "assets/images/car1.png");
-    iLoadImage(&CAR2, "assets/images/car2.png");
-    iLoadImage(&ROCK, "assets/images/rock.png");
-    iLoadImage(&player.file[Up], "assets/images/up.png");
-    iLoadImage(&player.file[Down], "assets/images/down.png");
-    iLoadImage(&player.file[Left], "assets/images/left.png");
-    iLoadImage(&player.file[Right], "assets/images/right.png");
-    iLoadImage(&player.file[Dead], "assets/images/Dead.png");
-    iLoadImage(&TRAIN, "assets/images/train(main).png");
-    iLoadImage(&EAGLE, "assets/images/eagle.png");
-    iLoadImage(&LILYPAD, "assets/images/lilypad.png");
-}
+
+
 int main(int argc, char *argv[])
 {
     Audio::initAudio();
     glutInit(&argc, argv);
-    srand(time(NULL));
-    Load_Image();
+    
+    load_resources();
     player.x = WIDTH / (2 * CELL);
     player.y = start_y;
     player.px = CELL * player.x;
     player.py = CELL * start_y;
     line.resize(ROW + 6);
-
+    resource_id =ranint(0,resources.size()-1);
+    Load_Image();
     for (int i = 0; i < line.size(); i++)
     {
         Spawn::all(i, (i <= start_y + 3 ? true : false));
@@ -813,7 +796,7 @@ int main(int argc, char *argv[])
     Timer::Eagle = iSetTimer(1.0 * eagle.speed_ms / eagle.fps, EagleSpawn);
     player.motion = Up;
 
-    Audio::playAudio(Audio::MUSIC_CHANNEL, true, MIX_MAX_VOLUME, "assets\\sounds\\traffic075x.ogg");
+    Audio::playAudio(Audio::MUSIC_CHANNEL, true, MIX_MAX_VOLUME,resources[resource_id].second[3].c_str());
     
     Timer::stopwatch = iSetTimer(1000 / FPS, stopwatch);
     Timer::HScrollpx = iSetTimer(std::max(1.0, PLAYER_SPEED / 10.0), Horizontal::scrollpx);

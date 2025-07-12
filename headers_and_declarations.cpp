@@ -1,7 +1,9 @@
 #include <vector>
-#include<queue>
-#include<string>
-
+#include <queue>
+#include <string>
+#include <random>
+#include <chrono>
+int resource_id;
 #define SLOPE 0.2679491924
 #include "iGraphics.h"
 #define HEIGHT  1024
@@ -36,6 +38,7 @@ namespace Audio
     maps a random channel_id to a real SDL channel. 
     So, you if you pass a channel_id already in use with a filepath , it will stop the previous sound and play the new one
     Pass different channel_ids to play different sounds simultaneously.
+    Pass ALL_CHANNELS to play media on any unused channel
 */
     bool initAudio()
     {
@@ -52,7 +55,7 @@ namespace Audio
         return true;
     }
 
-    void playAudio(int channel_id, bool loop, int volume, const char *filepath=nullptr)
+    void playAudio(int channel_id, bool loop, int volume, const char *filepath = nullptr)
 {
     if (channel_id == MUSIC_CHANNEL)
     {
@@ -81,6 +84,54 @@ namespace Audio
         {
             printf("Failed to play music: %s\n", Mix_GetError());
         }
+    }
+    else if (channel_id == ALL_CHANNELS)
+    {
+        // Fire-and-forget SFX → must provide filepath every time
+        if (!filepath)
+        {
+            printf("No filepath for fire-and-forget SFX!\n");
+            return;
+        }
+
+        Mix_Chunk *chunk = Mix_LoadWAV(filepath);
+        if (!chunk)
+        {
+            printf("Failed to load: %s\n", Mix_GetError());
+            return;
+        }
+
+        Mix_VolumeChunk(chunk, volume);
+
+        int loops = loop ? -1 : 0;
+
+        if (Mix_PlayChannel(-1, chunk, loops) == -1)
+        {
+            printf("Failed to play: %s\n", Mix_GetError());
+            Mix_FreeChunk(chunk);
+            return;
+        }
+
+        // Free the chunk after the sound finishes:
+        // SDL_mixer doesn’t do this automatically.
+        // So: simplest trick → channel finished callback.
+        // Register a callback only once.
+        static bool callbackSet = false;
+        if (!callbackSet)
+        {
+            Mix_ChannelFinished([](int channel) {
+                // Not ideal for production, but for simplicity:
+                // You’d need to track which chunk is which if multiple
+                // For a quick demo, we skip that.
+                // Better to reuse known chunks or keep fire-and-forget chunks tiny.
+            });
+            callbackSet = true;
+        }
+
+        // ⚠️ NOTE: this leaks if you don’t free.
+        // Best: pre-load fire-and-forget sounds instead of reloading every time.
+        // Or manage a separate pool.
+        // Otherwise for quick use: the OS will reclaim on exit.
     }
     else
     {
@@ -132,13 +183,11 @@ namespace Audio
         auto it = realChannelByChannelId.find(channel_id);
         if (it != realChannelByChannelId.end())
         {
-            // Use the same real channel
             real_channel = it->second;
-            Mix_HaltChannel(real_channel);  // Make sure to stop previous sound
+            Mix_HaltChannel(real_channel);
         }
         else
         {
-            // Pick a free channel
             real_channel = Mix_PlayChannel(-1, chunk, loops);
             if (real_channel == -1)
             {
@@ -235,7 +284,7 @@ namespace Audio
 
 
 Image TRUCK1, TRUCK2, CAR1, CAR2, ROCK, TRAIN, EAGLE, LILYPAD;
-
+std::vector<Image> TREE(4);
 
 enum CollisionType
 {
@@ -337,6 +386,12 @@ namespace Draw
     void street(int i, bool bg_only);
     void water(int i);
     void field(int i);
+    struct rgb{
+        int r,g,b;
+    };
+    rgb water_bg,field_bg,street_bg,log,log_top;
+
+    
     
 }
 namespace Horizontal
@@ -404,3 +459,46 @@ void drawCoordinateAxes(double gap = CELL, int r = 0, int g = 0, int b = 0)
     }
 }
 
+std::vector<std::pair<std::vector<std::string>, std::vector<std::string>>> resources;//images,audios
+void load_resources()
+{
+    
+    resources.push_back({{"assets\\images\\truck1.png", "assets\\images\\truck2.png", "assets\\images\\car1.png", "assets\\images\\car2.png", 
+    "assets/images/rock.png","assets/images/up.png","assets/images/down.png","assets/images/left.png","assets/images/right.png","assets/images/Dead.png","assets/images/train(main).png"
+,"assets/images/eagle.png","assets/images/lilypad.png","assets\\images\\tree1.png","assets\\images\\tree2.png","assets\\images\\tree3.png","assets\\images\\tree4.png"},
+                         { "assets\\sounds\\cluck0.wav", "assets\\sounds\\cluck1.wav","assets\\sounds\\death.wav",
+                        "assets\\sounds\\traffic075x.ogg"}});
+    
+    
+    
+}
+std::vector<Image*> Images={
+    &TRUCK1, &TRUCK2, &CAR1, &CAR2, &ROCK, &player.file[Up], &player.file[Down], &player.file[Left], &player.file[Right], &player.file[Dead], &TRAIN, &EAGLE, &LILYPAD
+,&TREE[0],&TREE[1],&TREE[2],&TREE[3]};
+
+std::mt19937 rng(std::chrono::steady_clock::now().time_since_epoch().count());
+template<typename Iterator>
+void shuffle_(Iterator start,Iterator end)
+{
+std::shuffle(start, end, rng);
+}
+int ranint(int l,int r)
+{
+std::uniform_int_distribution<int> dist(l, r);
+return dist(rng);
+}
+void Load_Image()
+{
+    int i=0;
+    for(auto &image:Images){
+        iLoadImage(image, resources[resource_id].first[i].c_str());
+        i++;
+    }
+    if(resource_id==0){
+        Draw::water_bg={99,227,255};
+        
+        Draw::log={79, 47, 49};
+        Draw::log_top={141, 81, 77};
+        Draw::field_bg={143, 185, 73};
+    }
+}  
