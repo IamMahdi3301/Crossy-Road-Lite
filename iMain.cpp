@@ -12,12 +12,25 @@ add train bell sound
 
 #include "headers_and_declarations.cpp"
 
+void SplashAnim()
+{
+    if(Collision!=Drown) return;
+    
+    
+    if(splash.frame_id==splash.frames.size())
+     return;   
+    
+    splash.frame_id++;    
+    
+
+}
 void Draw::water(int i)
 {
     std::vector<double> x = {(double)0, (double)WIDTH, (double)WIDTH, 0.0};
     std::vector<double> y = {(double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor), (double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor - SLOPE * x[1]), (double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor + CELL - SLOPE * x[2]), (double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor + CELL)};
     iSetColor(water_bg.r,water_bg.g,water_bg.b);
     iFilledPolygon(x.data(), y.data(), 4);
+    
     for (auto &data : line[i].data)
     {
         int length = data.size * CELL;
@@ -134,6 +147,7 @@ void Draw::street(int i, bool bg_only = false)
     for (auto &data : line[i].data)
 
     {
+        
         int length = data.size * CELL;
         int pos_x = data.pospx + 1.0 * Horizontal::H * CELL / player_fps;
         if (line[i].dir == 1)
@@ -143,9 +157,18 @@ void Draw::street(int i, bool bg_only = false)
         y.clear();
         x.insert(x.end(), {(double)pos_x, (double)(pos_x + length), (double)(pos_x + length), (double)pos_x});
         y.insert(y.end(), {(double)(pos_y - SLOPE * x[0]), (double)(pos_y - SLOPE * x[1]), (double)(pos_y + CELL - SLOPE * x[2]), (double)(pos_y + CELL - SLOPE * x[3])});
-        if (data.size == TRAIN_LEN)
+        if (data.size == TRAIN_LEN){
 
+            if(line[i].dir==1 ){
+                if((int)round(x[0])+length==-CELL*3)
+                Audio::playAudio(Audio::ALL_CHANNELS,false,MIX_MAX_VOLUME,resources[resource_id].second[line[i].speed_factor<2?5:6].c_str());
+            }else {
+                if((int)round(x[0])==WIDTH+CELL*3){
+                    Audio::playAudio(Audio::ALL_CHANNELS,false,MIX_MAX_VOLUME,resources[resource_id].second[line[i].speed_factor<2?5:6].c_str());
+                }
+            }
             iShowLoadedImage((int)round(x[0]), (int)round(y[0] - 2000 * SLOPE + CELL / 3.0), &TRAIN);
+        }
 
         if (data.size == TRUCK_LEN)
         {
@@ -174,13 +197,13 @@ void Spawn::street(int line_i)
 
     if (rnd < 2)
     {
-        line[line_i].speed_factor = std::max(1.0, (1 + ranint(0, 3)) * FPS / 60.0);
+        line[line_i].speed_factor = std::max(1.0,round(( ranint(1, 2)) * FPS / 60.0) );
 
         int pos = (ranint(0, (TRAIN_LEN * 3))) * dir;
         for (int i = 0; i < line[line_i].data.size(); i++)
         {
             line[line_i].data[i] = {pos, (double)pos * CELL, TRAIN_LEN};
-            pos += -dir * (TRAIN_LEN * (ranint(5, 10)) + ranint(0, 6));
+            pos += -dir * (TRAIN_LEN * (ranint(3, 5)) + ranint(10, 30));
         }
     }
     else
@@ -304,6 +327,7 @@ void Horizontal::scrollpx()
     }
 }
 
+
 void motion()
 {
 
@@ -405,7 +429,9 @@ void motion()
 void stopwatch()
 {
 
+    
     TIME = (TIME + 1LL) % INT32_MAX;
+    Audio::processDeletionQueue();
     if (!Collision)
     {
         Vertical::V = (Vertical::V + 1) % Vertical::scroll_factor;
@@ -416,10 +442,12 @@ void stopwatch()
             Vertical::scroll();
     }
     Horizontal::scroll(0);
+    
 }
 
 bool collision(int line_i)
 {
+    if(Collision==Drown ) return true;
     if (line[line_i].type == Field)
         return false;
     if (line[line_i].dir == 0)
@@ -456,6 +484,7 @@ bool collision(int line_i)
 
             if (line[line_i].dir == -1 && id < line[line_i].data.size() && (player.px + CELL) - line[line_i].data[id + 1].pospx > 10)
             {
+                /* if(!Collision) */
                 player.x++;
 
                 onLog = line[line_i].speed_factor * line[line_i].dir;
@@ -585,12 +614,15 @@ void Horizontal::scroll(int x)
         if (onLog)
         {
 
+            if(Collision!=Drown){
             player.px += 1.0 * CELL / onLog;
             if (TIME % abs(onLog) == 0)
             {
+                
                 player.x += (onLog > 0 ? 1 : -1);
                 player.px = player.x * CELL;
             }
+        }
         }
         for (int i = 0; i < line.size(); i++)
         {
@@ -647,6 +679,7 @@ void iDraw()
         onLog = 0;
     if (collision(player.y))
     {
+        if(Collision!=FlownWithLog && Collision!=Drown)
         player.motion = Dead;
         player.frame_no = 0;
         /**/
@@ -668,16 +701,34 @@ void iDraw()
         else if (line[i].type == Water)
             Draw::water(i);
     }
-
+    static bool flown_sound=false;
+    static bool drown_sound=false;
     for (int i = line.size() - 1; i >= 0; i--)
     {
 
         if (line[i].type == Field)
             Draw::field(i);
-        if (i == player.y && Collision && !deathSound && Collision != Eagle)
+            
+            
+        if(i==player.y && Collision==Drown && splash.frame_id<splash.frames.size()){
+            if(splash.frame_id==0)
+        splash.pos={/* player.x*CELL */player.px-CELL,/* player.y*CELL-player.x*CELL*SLOPE */player.py-SLOPE*player.px};
+            iShowLoadedImage(splash.pos.first,splash.pos.second,splash.frames[splash.frame_id]);
+            iShowLoadedImage(player.px,player.py-SLOPE*player.px-2*splash.frame_id,&player.file[player.motion]);
+        }
+    
+        if (i == player.y && Collision && !deathSound && Collision != Eagle && Collision!=FlownWithLog)
         {
-            Audio::playAudio(2, false, 35,resources[resource_id].second[2].c_str());
+            Audio::playAudio(2, false, 64,resources[resource_id].second[2].c_str());
             deathSound = 1;
+        }
+        if(i==player.y && Collision==Drown && !drown_sound){
+            Audio::playAudio(4,false,MIX_MAX_VOLUME,resources[resource_id].second[8].c_str());
+            drown_sound=true;
+        }
+        if(i==player.y && Collision==FlownWithLog && !flown_sound){
+            Audio::playAudio(3,false,MIX_MAX_VOLUME,resources[resource_id].second[7].c_str());
+            flown_sound=true;
         }
         if (i == player.y && Collision != Drown && eagle.py >= player.py - CELL)
         {
@@ -696,6 +747,9 @@ void iDraw()
         if (line[i].type == Street)
             Draw::street(i);
     }
+    //std::cerr<<splash_anim_cnt<<'\n';
+    
+    
     iShowLoadedImage(eagle.px, eagle.py, &EAGLE);
 }
 
@@ -756,6 +810,7 @@ void iSpecialKeyboard(unsigned char key, int state)
 }
 void EagleSpawn()
 {
+    static bool played_sound=false;
     if (Collision != Eagle)
         return;
     if (eagle.py < -HEIGHT)
@@ -765,11 +820,15 @@ void EagleSpawn()
     }
     eagle.px = (20.0 / CELL) * (eagle.py - player.py) + player.px - CELL;
     eagle.py -= 1.0 * HEIGHT / eagle.fps;
+    if(fabs(eagle.py-(HEIGHT-CELL))<CELL && !played_sound){
+        Audio::playAudio(Audio::ALL_CHANNELS,false,MIX_MAX_VOLUME,resources[resource_id].second[4].c_str());
+        played_sound=true;
+    }
     if (fabs(eagle.py - player.py) < CELL)
     {
         if (!deathSound)
         {
-            Audio::playAudio(2, false, 35, resources[resource_id].second[2].c_str());
+            Audio::playAudio(2, false, 64, resources[resource_id].second[2].c_str());
             deathSound = 1;
         }
     }
@@ -779,6 +838,7 @@ void EagleSpawn()
 int main(int argc, char *argv[])
 {
     Audio::initAudio();
+    Mix_AllocateChannels(Audio::MAX_AUDIO_CHANNEL);
     glutInit(&argc, argv);
     
     load_resources();
@@ -801,6 +861,7 @@ int main(int argc, char *argv[])
     Timer::stopwatch = iSetTimer(1000 / FPS, stopwatch);
     Timer::HScrollpx = iSetTimer(std::max(1.0, PLAYER_SPEED / 10.0), Horizontal::scrollpx);
     iPauseTimer(Timer::HScrollpx);
+    iSetTimer(round(700.0/splash.frames.size()),SplashAnim);
     Timer::player = iSetTimer(PLAYER_SPEED / (player_fps), motion);
     iOpenWindow(WIDTH, HEIGHT, "Crossy Road Lite");
     return 0;
