@@ -360,7 +360,7 @@ namespace Draw
 {
 
     void street(int i, bool bg_only);
-    void water(int i);
+    void water(int i,bool bg_only);
     void field(int i);
     struct rgb
     {
