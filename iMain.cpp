@@ -165,7 +165,8 @@ void drawMainMenu()
 
     // Title
     iSetColor(255, 255, 255);
-    iText(WIDTH / 2 - 100, HEIGHT - 100, "CROSSY ROAD LITE", GLUT_BITMAP_TIMES_ROMAN_24);
+    
+    iShowText(WIDTH / 2 - 100, HEIGHT - 100, "CROSSY ROAD LITE", "SacrificeDemo-8Ox1B.ttf");
 
     // Menu items
     const char *menuItems[] = {"Start New Game", /* "Resume Game", */ "Exit", "Contributors", "Instructions"};
@@ -176,7 +177,7 @@ void drawMainMenu()
         if (i == menuSelection)
         {
             iSetColor(0, 0, 0); // Yellow for selected item
-            iText(40, startY - i * 50, "> ", GLUT_BITMAP_HELVETICA_18);
+            iShowText(40, startY - i * 50, "> ","SacrificeDemo-8Ox1B.ttf");
         }
         else
         {
@@ -189,14 +190,14 @@ void drawMainMenu()
             iSetColor(10, 10, 10); // Darker gray for disabled
         }
 
-        iText(60, startY - i * 50, menuItems[i], GLUT_BITMAP_HELVETICA_18);
+        iShowText(60, startY - i * 50, menuItems[i], "SacrificeDemo-8Ox1B.ttf");
     }
 
     // Instructions
     iSetColor(150, 150, 150);
-    iText(20, startY - MENU_ITEMS * 50 - 20, "Use UP/DOWN/LEFT/RIGHT arrows to navigate", GLUT_BITMAP_HELVETICA_12);
-    iText(60, startY - MENU_ITEMS * 50 - 40, "Press ENTER to select", GLUT_BITMAP_HELVETICA_12);
-    iText(40, startY - MENU_ITEMS * 50 - 60, "Press ESC to pause during game", GLUT_BITMAP_HELVETICA_12);
+    iShowText(20, startY - MENU_ITEMS * 50 - 20, "Use UP/DOWN arrows or mouse to navigate","SacrificeDemo-8Ox1B.ttf");
+    iShowText(60, startY - MENU_ITEMS * 50 - 40, "Press ENTER to select", "SacrificeDemo-8Ox1B.ttf");
+    iShowText(40, startY - MENU_ITEMS * 50 - 60, "Press ESC to pause during game", "SacrificeDemo-8Ox1B.ttf");
 }
 
 void drawContributors()
@@ -205,31 +206,32 @@ void drawContributors()
 
     // Title
     iSetColor(255, 255, 255);
-    iText(WIDTH / 2 - 80, HEIGHT - 100, "CONTRIBUTORS", GLUT_BITMAP_TIMES_ROMAN_24);
+    iShowText(WIDTH / 2 - 80, HEIGHT - 100, "CONTRIBUTORS","SacrificeDemo-8Ox1B.ttf");
 
     // Contributors list
     const char *contributors[] = {
-        "1. Anwarul Bashir Shuaib",
-        "2. Dipjyoti Das",
-        "3. Md Abdun Noor Nayef Mahdi"};
+        
+        "1. Dipjyoti Das\nID:2405095\nCSE-24",
+        "2. Md Abdun Noor Nayef Mahdi\nID:2405091\nCSE-24",
+    "Supervisor: Anwarul Bashir Shuaib"};
     int startY = HEIGHT / 2 + 50;
 
     for (int i = 0; i < 3; i++)
     {
         iSetColor(200, 200, 200);
-        iText(WIDTH / 2 - 100, startY - i * 50, contributors[i], GLUT_BITMAP_HELVETICA_18);
+        iShowText(WIDTH / 2 - 100, startY - i * 50, contributors[i], "SacrificeDemo-8Ox1B.ttf");
     }
 
     // Back option
     if (menuSelection == 0)
     {
         iSetColor(255, 255, 0); // Yellow for selected
-        iText(WIDTH / 2 - 80, startY - 3 * 50 - 50, "> Back", GLUT_BITMAP_HELVETICA_18);
+        iShowText(WIDTH / 2 - 80, startY - 3 * 50 - 50, "> Back","SacrificeDemo-8Ox1B.ttf");
     }
     else
     {
         iSetColor(200, 200, 200);
-        iText(WIDTH / 2 - 60, startY - 3 * 50 - 50, "Back", GLUT_BITMAP_HELVETICA_18);
+        iShowText(WIDTH / 2 - 60, startY - 3 * 50 - 50, "Back", "SacrificeDemo-8Ox1B.ttf");
     }
 }
 
@@ -239,7 +241,7 @@ void drawInstructions()
 
     // Title
     iSetColor(255, 255, 255);
-    iText(WIDTH / 2 - 80, HEIGHT - 100, "INSTRUCTIONS", GLUT_BITMAP_TIMES_ROMAN_24);
+    iShowText(WIDTH / 2 - 80, HEIGHT - 100, "INSTRUCTIONS", "SacrificeDemo-8Ox1B.ttf");
 
     // Instructions list
     const char *instructions[] = {
@@ -251,19 +253,19 @@ void drawInstructions()
     for (int i = 0; i < 3; i++)
     {
         iSetColor(150, 150, 150);
-        iText(WIDTH / 2 - 120, startY - i * 50, instructions[i], GLUT_BITMAP_HELVETICA_12);
+        iShowText(WIDTH / 2 - 120, startY - i * 50, instructions[i], "SacrificeDemo-8Ox1B.ttf");
     }
 
     // Back option
     if (menuSelection == 0)
     {
         iSetColor(255, 255, 0); // Yellow for selected
-        iText(WIDTH / 2 - 80, startY - 3 * 50 - 50, "> Back", GLUT_BITMAP_HELVETICA_18);
+        iShowText(WIDTH / 2 - 80, startY - 3 * 50 - 50, "> Back", "SacrificeDemo-8Ox1B.ttf");
     }
     else
     {
         iSetColor(200, 200, 200);
-        iText(WIDTH / 2 - 60, startY - 3 * 50 - 50, "Back", GLUT_BITMAP_HELVETICA_18);
+        iShowText(WIDTH / 2 - 60, startY - 3 * 50 - 50, "Back", "SacrificeDemo-8Ox1B.ttf");
     }
 }
 
@@ -279,11 +281,11 @@ void drawPauseMenu()
     iRectangle(WIDTH / 2 - 150, HEIGHT / 2 - 100, 300, 200);
 
     // Pause title
-    iText(WIDTH / 2 - 40, HEIGHT / 2 + 50, "PAUSED", GLUT_BITMAP_TIMES_ROMAN_24);
+    iShowText(WIDTH / 2 - 40, HEIGHT / 2 + 50, "PAUSED", "SacrificeDemo-8Ox1B.ttf");
 
     // Instructions
-    iText(WIDTH / 2 - 80, HEIGHT / 2, "Press ESC to resume", GLUT_BITMAP_HELVETICA_18);
-    iText(WIDTH / 2 - 100, HEIGHT / 2 - 30, "Press END to quit to menu", GLUT_BITMAP_HELVETICA_18);
+    iShowText(WIDTH / 2 - 80, HEIGHT / 2, "Press ESC to resume", "SacrificeDemo-8Ox1B.ttf");
+    iShowText(WIDTH / 2 - 100, HEIGHT / 2 - 30, "Press END to quit to menu", "SacrificeDemo-8Ox1B.ttf");
 }
 
 void drawGameOver()
@@ -297,17 +299,17 @@ void drawGameOver()
     iSetTransparentColor(0, 0, 0, 0.5);
     iFilledRectangle(WIDTH / 2 - 150, HEIGHT / 2 - 100, 300, 520);
     iSetColor(255, 0, 0);
-    iText(WIDTH / 2 - 80, HEIGHT - 100, "GAME OVER", GLUT_BITMAP_TIMES_ROMAN_24);
+    iShowText(WIDTH / 2 - 80, HEIGHT - 100, "GAME OVER", "SacrificeDemo-8Ox1B.ttf");
 
     // Display final score and high score
     char scoreText[50];
     iSetColor(255, 255, 255);
 
     sprintf(scoreText, "Final Score: %d", finalScore);
-    iText(WIDTH / 2 - 80, HEIGHT - 300, scoreText, GLUT_BITMAP_HELVETICA_18);
+    iShowText(WIDTH / 2 - 80, HEIGHT - 300, scoreText, "SacrificeDemo-8Ox1B.ttf");
 
     sprintf(scoreText, "High Score: %d", highScore);
-    iText(WIDTH / 2 - 80, HEIGHT - 350, scoreText, GLUT_BITMAP_HELVETICA_18);
+    iShowText(WIDTH / 2 - 80, HEIGHT - 350, scoreText, "SacrificeDemo-8Ox1B.ttf");
 
     // Collision type
     const char *collisionMessages[] = {
@@ -320,7 +322,7 @@ void drawGameOver()
     if (Collision < 5)
     {
         iSetColor(255, 255, 0);
-        iText(WIDTH / 2 - 100, HEIGHT - 220, collisionMessages[Collision], GLUT_BITMAP_HELVETICA_18);
+        iShowText(WIDTH / 2 - 100, HEIGHT - 220, collisionMessages[Collision], "SacrificeDemo-8Ox1B.ttf");
     }
 
     // Menu options
@@ -332,19 +334,19 @@ void drawGameOver()
         if (i == menuSelection)
         {
             iSetColor(255, 255, 0);
-            iText(WIDTH / 2 - 80, startY - i * 50, "> ", GLUT_BITMAP_HELVETICA_18);
+            iShowText(WIDTH / 2 - 80, startY - i * 50, "> ", "SacrificeDemo-8Ox1B.ttf");
         }
         else
         {
             iSetColor(200, 200, 200);
         }
-        iText(WIDTH / 2 - 60, startY - i * 50, gameOverItems[i], GLUT_BITMAP_HELVETICA_18);
+        iShowText(WIDTH / 2 - 60, startY - i * 50, gameOverItems[i], "SacrificeDemo-8Ox1B.ttf");
     }
 
     // Instructions
     iSetColor(150, 150, 150);
-    iText(WIDTH / 2 - 120, 100, "Use UP/DOWN arrows to navigate", GLUT_BITMAP_HELVETICA_12);
-    iText(WIDTH / 2 - 80, 80, "Press ENTER to select", GLUT_BITMAP_HELVETICA_12);
+    iShowText(WIDTH / 2 - 120, 100, "Use UP/DOWN arrows to navigate", "SacrificeDemo-8Ox1B.ttf");
+    iShowText(WIDTH / 2 - 80, 80, "Press ENTER to select", "SacrificeDemo-8Ox1B.ttf");
 }
 
 void SplashAnim()
@@ -1124,9 +1126,9 @@ void iDraw()
         iSetColor(31, 31, 31);
         sprintf(scoreText, "Score: %d", currentScore);
         // iSetLineWidth(6);
-        iText(CELL, HEIGHT - CELL * 4, scoreText, GLUT_BITMAP_TIMES_ROMAN_24);
+        iShowText(CELL, HEIGHT - CELL * 4, scoreText, "SacrificeDemo-8Ox1B.ttf");
         sprintf(scoreText, "High Score: %d", highScore);
-        iText(CELL, HEIGHT - CELL * 6, scoreText, GLUT_BITMAP_TIMES_ROMAN_24);
+        iShowText(CELL, HEIGHT - CELL * 6, scoreText, "SacrificeDemo-8Ox1B.ttf");
         // Draw custom mouse cursor (semi-transparent to indicate no interaction)
         iSetColor(255, 0, 0); // RGBA with alpha for transparency
         iFilledCircle(mouseX, mouseY, 5);
@@ -1500,6 +1502,7 @@ int main(int argc, char *argv[])
 {
 
     Audio::initAudio();
+    iInitializeFont();
     Mix_AllocateChannels(Audio::MAX_AUDIO_CHANNEL);
     glutInit(&argc, argv);
     auto hfp = fopen("highestscore", "r");

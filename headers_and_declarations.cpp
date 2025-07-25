@@ -4,7 +4,7 @@
 #include <random>
 #include <chrono>
 #include <iostream>
-
+#include "iFont.h"
 int resource_id;
 #define SLOPE 0.2679491924
 #include "iGraphics.h"
