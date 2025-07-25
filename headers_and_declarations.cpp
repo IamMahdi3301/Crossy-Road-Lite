@@ -258,7 +258,7 @@ namespace Audio
     }
 }
 
-Image TRUCK1, TRUCK2, CAR1, CAR2, ROCK, TRAIN, EAGLE, LILYPAD;//remember to free image when usin multiple DLC
+Image TRUCK1, TRUCK2, CAR1, CAR2, ROCK, TRAIN, EAGLE, LILYPAD,MENU_IMAGE;//remember to free image when usin multiple DLC
 struct MySprite{
     std::pair<double,double> pos;
     std::vector<Image*> frames;
@@ -436,12 +436,12 @@ void load_resources()
 {
 
     resources.push_back({{"assets\\images\\truck1.png", "assets\\images\\truck2.png", "assets\\images\\car1.png", "assets\\images\\car2.png",
-                          "assets/images/rock.png", "assets/images/up.png", "assets/images/down.png", "assets/images/left.png", "assets/images/right.png", "assets/images/Dead.png", "assets/images/train(main).png", "assets/images/eagle.png", "assets/images/lilypad.png", "assets\\images\\tree1.png", "assets\\images\\tree2.png", "assets\\images\\tree3.png", "assets\\images\\tree4.png"},
+                          "assets/images/rock.png", "assets/images/up.png", "assets/images/down.png", "assets/images/left.png", "assets/images/right.png", "assets/images/Dead.png", "assets/images/train(main).png", "assets/images/eagle.png", "assets/images/lilypad.png", "assets\\images\\tree1.png", "assets\\images\\tree2.png", "assets\\images\\tree3.png", "assets\\images\\tree4.png","assets\\images\\cover_page.png"},
                          {"assets\\sounds\\cluck0.wav", "assets\\sounds\\cluck1.wav", "assets\\sounds\\death.wav",
                           "assets\\sounds\\traffic.ogg", "assets\\sounds\\eagle.wav", "assets\\sounds\\train.wav", "assets\\sounds\\train05x.wav", "assets\\sounds\\flown.wav", "assets\\sounds\\drown.wav"}});
 }
 std::vector<Image *> Images = {
-    &TRUCK1, &TRUCK2, &CAR1, &CAR2, &ROCK, &player.file[Up], &player.file[Down], &player.file[Left], &player.file[Right], &player.file[Dead], &TRAIN, &EAGLE, &LILYPAD, &TREE[0], &TREE[1], &TREE[2], &TREE[3]};
+    &TRUCK1, &TRUCK2, &CAR1, &CAR2, &ROCK, &player.file[Up], &player.file[Down], &player.file[Left], &player.file[Right], &player.file[Dead], &TRAIN, &EAGLE, &LILYPAD, &TREE[0], &TREE[1], &TREE[2], &TREE[3],&MENU_IMAGE};
 
 std::mt19937 rng(std::chrono::steady_clock::now().time_since_epoch().count());
 template <typename Iterator>
