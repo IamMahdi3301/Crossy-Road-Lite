@@ -499,7 +499,7 @@ void Load_Image()
         for (int i = 0; i < splash.frames.size(); ++i) {
             splash.frames[i] = new Image; 
             iLoadImage(splash.frames[i], std::string("assets\\images\\Splash\\" + std::to_string(i) + ".png").c_str());
-            std::cerr << std::string("assets\\images\\Splash\\" + std::to_string(i) + ".png") << '\n';
+            
         }
         
     }

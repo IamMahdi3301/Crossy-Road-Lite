@@ -26,6 +26,7 @@ int mouseX = 0, mouseY = 0;
 
 void resetGame()
 {
+    
     currentScore = 0;
     drown_sound = false;
     flown_sound = false;
@@ -56,6 +57,7 @@ void resetGame()
 
     // Reset timers
     Vertical::V = 0;
+    Vertical::scroll_factor=Vertical::base_factor;
     Horizontal::H = 0;
     TIME = 0;
 
@@ -120,7 +122,7 @@ void handleGameOver()
             {
 #ifdef _WIN32
                 // Remove read-only if present
-                system("attrib -r highestscore");
+                //system("attrib highestscore");
                 hfp = fopen("highestscore", "w"); // Try again
 #endif
             }
@@ -130,7 +132,7 @@ void handleGameOver()
                 fprintf(hfp, "%lld", highScore);
                 fclose(hfp);
 #ifdef _WIN32
-                system("attrib +h +r highestscore"); // Hide and protect again
+                //system("attrib +h +r highestscore"); // Hide and protect again
 #endif
             }
             else
@@ -1182,6 +1184,7 @@ void iMouse(int button, int state, int mx, int my)
                         Audio::pauseAudio(Audio::ALL_CHANNELS);
                         Audio::cleanAudio();
                         // iCloseWindow();
+                        system("attrib +h +r highestscore");
                         exit(0);
                         break;
                     case 2: // Contributors
@@ -1375,6 +1378,7 @@ void iKeyboard(unsigned char key, int state)
             case 1: // Exit
                 Audio::pauseAudio(Audio::ALL_CHANNELS);
                 Audio::cleanAudio();
+                system("attrib +h +r highestscore");
                 exit(0);
                 // iCloseWindow();its getting (exit code: -1073741819)
                 break;
@@ -1502,6 +1506,7 @@ int main(int argc, char *argv[])
     if (hfp)
     {
         fscanf(hfp, "%lld", &highScore);
+        system("attrib  +h highestscore");
         fclose(hfp);
     }
     load_resources();
