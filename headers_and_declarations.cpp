@@ -258,14 +258,15 @@ namespace Audio
     }
 }
 
-Image TRUCK1, TRUCK2, CAR1, CAR2, ROCK, TRAIN, EAGLE, LILYPAD,MENU_IMAGE;//remember to free image when usin multiple DLC
+Image TRUCK1, TRUCK2, CAR1, CAR2, ROCK, TRAIN, EAGLE, LILYPAD, MENU_IMAGE; // remember to free image when usin multiple DLC
 bool flown_sound = false;
-    bool drown_sound = false;
-    bool eagle_sound = false;
-struct MySprite{
-    std::pair<double,double> pos;
-    std::vector<Image*> frames;
-    int frame_id=0;
+bool drown_sound = false;
+bool eagle_sound = false;
+struct MySprite
+{
+    std::pair<double, double> pos;
+    std::vector<Image *> frames;
+    int frame_id = 0;
 };
 MySprite splash;
 std::vector<Image> TREE(4);
@@ -363,7 +364,7 @@ namespace Draw
 {
 
     void street(int i, bool bg_only);
-    void water(int i,bool bg_only);
+    void water(int i, bool bg_only);
     void field(int i);
     struct rgb
     {
@@ -439,12 +440,12 @@ void load_resources()
 {
 
     resources.push_back({{"assets\\images\\truck1.png", "assets\\images\\truck2.png", "assets\\images\\car1.png", "assets\\images\\car2.png",
-                          "assets/images/rock.png", "assets/images/up.png", "assets/images/down.png", "assets/images/left.png", "assets/images/right.png", "assets/images/Dead.png", "assets/images/train(main).png", "assets/images/eagle.png", "assets/images/lilypad.png", "assets\\images\\tree1.png", "assets\\images\\tree2.png", "assets\\images\\tree3.png", "assets\\images\\tree4.png","assets\\images\\cover_page.png"},
+                          "assets/images/rock.png", "assets/images/up.png", "assets/images/down.png", "assets/images/left.png", "assets/images/right.png", "assets/images/Dead.png", "assets/images/train(main).png", "assets/images/eagle.png", "assets/images/lilypad.png", "assets\\images\\tree1.png", "assets\\images\\tree2.png", "assets\\images\\tree3.png", "assets\\images\\tree4.png", "assets\\images\\cover_page.png"},
                          {"assets\\sounds\\cluck0.wav", "assets\\sounds\\cluck1.wav", "assets\\sounds\\death.wav",
-                          "assets\\sounds\\traffic.ogg", "assets\\sounds\\eagle.wav", "assets\\sounds\\train.wav", "assets\\sounds\\train05x.wav", "assets\\sounds\\flown.wav", "assets\\sounds\\drown.wav","assets\\sounds\\click.wav"}});
+                          "assets\\sounds\\traffic.ogg", "assets\\sounds\\eagle.wav", "assets\\sounds\\train.wav", "assets\\sounds\\train05x.wav", "assets\\sounds\\flown.wav", "assets\\sounds\\drown.wav", "assets\\sounds\\click.wav"}});
 }
 std::vector<Image *> Images = {
-    &TRUCK1, &TRUCK2, &CAR1, &CAR2, &ROCK, &player.file[Up], &player.file[Down], &player.file[Left], &player.file[Right], &player.file[Dead], &TRAIN, &EAGLE, &LILYPAD, &TREE[0], &TREE[1], &TREE[2], &TREE[3],&MENU_IMAGE};
+    &TRUCK1, &TRUCK2, &CAR1, &CAR2, &ROCK, &player.file[Up], &player.file[Down], &player.file[Left], &player.file[Right], &player.file[Dead], &TRAIN, &EAGLE, &LILYPAD, &TREE[0], &TREE[1], &TREE[2], &TREE[3], &MENU_IMAGE};
 
 std::mt19937 rng(std::chrono::steady_clock::now().time_since_epoch().count());
 template <typename Iterator>
@@ -458,7 +459,7 @@ int ranint(int l, int r)
     return dist(rng);
 }
 #ifdef _WIN32
-    #include <io.h>
+#include <io.h>
 #endif
 void Load_Image()
 {
@@ -476,8 +477,7 @@ void Load_Image()
         Draw::log_top = {141, 81, 77};
         Draw::field_bg = {143, 185, 73};
 
-        
-        auto count_files=[](const std::string &folder)//not for linux
+        auto count_files = [](const std::string &folder) // not for linux
         {
             int count = 0;
             struct _finddata_t fileinfo;
@@ -493,14 +493,13 @@ void Load_Image()
             }
             return count;
         };
-        
+
         splash.frames.resize(count_files("assets\\images\\Splash"));
-        
-        for (int i = 0; i < splash.frames.size(); ++i) {
-            splash.frames[i] = new Image; 
+
+        for (int i = 0; i < splash.frames.size(); ++i)
+        {
+            splash.frames[i] = new Image;
             iLoadImage(splash.frames[i], std::string("assets\\images\\Splash\\" + std::to_string(i) + ".png").c_str());
-            
         }
-        
     }
 }

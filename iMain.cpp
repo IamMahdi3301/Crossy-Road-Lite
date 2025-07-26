@@ -166,7 +166,7 @@ void drawMainMenu()
     // Title
     iSetColor(255, 255, 255);
     
-    iShowText(WIDTH / 2 - 100, HEIGHT - 100, "CROSSY ROAD LITE", "Supercell-magic-webfont.ttf");
+    iShowText(WIDTH / 2 - 100, HEIGHT - 100, "CROSSY ROAD LITE", "assets/Fonts/Supercell-magic-webfont.ttf");
 
     // Menu items
     const char *menuItems[] = {"Start New Game", /* "Resume Game", */ "Exit", "Contributors", "Instructions"};
@@ -177,7 +177,7 @@ void drawMainMenu()
         if (i == menuSelection)
         {
             iSetColor(0, 0, 0); // Yellow for selected item
-            iShowText(40, startY - i * 50, "> ","Supercell-magic-webfont.ttf");
+            iShowText(40, startY - i * 50, "> ","assets/Fonts/Supercell-magic-webfont.ttf");
         }
         else
         {
@@ -190,14 +190,14 @@ void drawMainMenu()
             iSetColor(10, 10, 10); // Darker gray for disabled
         }
 
-        iShowText(60, startY - i * 50, menuItems[i], "Supercell-magic-webfont.ttf");
+        iShowText(60, startY - i * 50, menuItems[i], "assets/Fonts/Supercell-magic-webfont.ttf");
     }
 
     // Instructions
     //iSetColor(150, 150, 150);
-    //iShowText(20, startY - MENU_ITEMS * 50 - 20, "Use UP/DOWN arrows or mouse to navigate","Supercell-magic-webfont.ttf");
-    //iShowText(60, startY - MENU_ITEMS * 50 - 40, "Press ENTER to select", "Supercell-magic-webfont.ttf");
-    //iShowText(40, startY - MENU_ITEMS * 50 - 60, "Press ESC to pause during game", "Supercell-magic-webfont.ttf");
+    //iShowText(20, startY - MENU_ITEMS * 50 - 20, "Use UP/DOWN arrows or mouse to navigate","assets/Fonts/Supercell-magic-webfont.ttf");
+    //iShowText(60, startY - MENU_ITEMS * 50 - 40, "Press ENTER to select", "assets/Fonts/Supercell-magic-webfont.ttf");
+    //iShowText(40, startY - MENU_ITEMS * 50 - 60, "Press ESC to pause during game", "assets/Fonts/Supercell-magic-webfont.ttf");
 }
 
 void drawContributors()
@@ -206,7 +206,7 @@ void drawContributors()
 
     // Title
     iSetColor(255, 255, 255);
-    iShowText(WIDTH / 2 - 100, HEIGHT - 100, "CONTRIBUTORS","Supercell-magic-webfont.ttf");
+    iShowText(WIDTH / 2 - 100, HEIGHT - 100, "CONTRIBUTORS","assets/Fonts/Supercell-magic-webfont.ttf");
 
     // Contributors list
     const char *contributors[] = {
@@ -219,19 +219,19 @@ void drawContributors()
     for (int i = 0; i < 3; i++)
     {
         iSetColor(200, 200, 200);
-        iShowText(WIDTH / 2 - 300, startY - i * 50, contributors[i], "Supercell-magic-webfont.ttf");
+        iShowText(WIDTH / 2 - 300, startY - i * 50, contributors[i], "assets/Fonts/Supercell-magic-webfont.ttf");
     }
 
     // Back option
     if (menuSelection == 0)
     {
         iSetColor(255, 255, 0); // Yellow for selected
-        iShowText(WIDTH / 2 - 80, startY - 3 * 50 - 50, "> Back","Supercell-magic-webfont.ttf");
+        iShowText(WIDTH / 2 - 80, startY - 3 * 50 - 50, "> Back","assets/Fonts/Supercell-magic-webfont.ttf");
     }
     else
     {
         iSetColor(200, 200, 200);
-        iShowText(WIDTH / 2 - 60, startY - 3 * 50 - 50, "Back", "Supercell-magic-webfont.ttf");
+        iShowText(WIDTH / 2 - 60, startY - 3 * 50 - 50, "Back", "assets/Fonts/Supercell-magic-webfont.ttf");
     }
 }
 
@@ -241,7 +241,7 @@ void drawInstructions()
 
     // Title
     iSetColor(255, 255, 255);
-    iShowText(WIDTH / 2 - 80, HEIGHT - 100, "INSTRUCTIONS", "Supercell-magic-webfont.ttf");
+    iShowText(WIDTH / 2 - 80, HEIGHT - 100, "INSTRUCTIONS", "assets/Fonts/Supercell-magic-webfont.ttf");
 
     // Instructions list
     const char *instructions[] = {
@@ -253,19 +253,19 @@ void drawInstructions()
     for (int i = 0; i < 3; i++)
     {
         iSetColor(150, 150, 150);
-        iShowText(WIDTH / 2 - 300, startY - i * 50, instructions[i], "Supercell-magic-webfont.ttf");
+        iShowText(WIDTH / 2 - 300, startY - i * 50, instructions[i], "assets/Fonts/Supercell-magic-webfont.ttf");
     }
 
     // Back option
     if (menuSelection == 0)
     {
         iSetColor(255, 255, 0); // Yellow for selected
-        iShowText(WIDTH / 2 - 80, startY - 3 * 50 - 50, "> Back", "Supercell-magic-webfont.ttf");
+        iShowText(WIDTH / 2 - 80, startY - 3 * 50 - 50, "> Back", "assets/Fonts/Supercell-magic-webfont.ttf");
     }
     else
     {
         iSetColor(200, 200, 200);
-        iShowText(WIDTH / 2 - 60, startY - 3 * 50 - 50, "Back", "Supercell-magic-webfont.ttf");
+        iShowText(WIDTH / 2 - 60, startY - 3 * 50 - 50, "Back", "assets/Fonts/Supercell-magic-webfont.ttf");
     }
 }
 
@@ -281,11 +281,11 @@ void drawPauseMenu()
     iRectangle(WIDTH / 2 - 150, HEIGHT / 2 - 100, 450, 200);
 
     // Pause title
-    iShowText(WIDTH / 2 - 40, HEIGHT / 2 + 50, "         PAUSED", "Supercell-magic-webfont.ttf");
+    iShowText(WIDTH / 2 - 40, HEIGHT / 2 + 50, "         PAUSED", "assets/Fonts/Supercell-magic-webfont.ttf");
 
     // Instructions
-    iShowText(WIDTH / 2 - 80, HEIGHT / 2, "Press ESC to resume", "Supercell-magic-webfont.ttf");
-    iShowText(WIDTH / 2 - 100, HEIGHT / 2 - 30, "Press END to quit to menu", "Supercell-magic-webfont.ttf");
+    iShowText(WIDTH / 2 - 80, HEIGHT / 2, "Press ESC to resume", "assets/Fonts/Supercell-magic-webfont.ttf");
+    iShowText(WIDTH / 2 - 100, HEIGHT / 2 - 30, "Press END to quit to menu", "assets/Fonts/Supercell-magic-webfont.ttf");
 }
 
 void drawGameOver()
@@ -299,17 +299,17 @@ void drawGameOver()
     iSetTransparentColor(0, 0, 0, 0.5);
     iFilledRectangle(WIDTH / 2 - 150-CELL, HEIGHT / 2 - 100-220, 520, 520);
     iSetColor(255, 0, 0);
-    iShowText(WIDTH / 2 - 80-95, HEIGHT - 100-220+CELL, "GAME OVER", "Supercell-magic-webfont.ttf",50);
+    iShowText(WIDTH / 2 - 80-95, HEIGHT - 100-220+CELL, "GAME OVER", "assets/Fonts/Supercell-magic-webfont.ttf",50);
 
     // Display final score and high score
     char scoreText[50];
     iSetColor(255, 255, 255);
 
     sprintf(scoreText, "Final Score: %d", finalScore);
-    iShowText(WIDTH / 2 - 80, HEIGHT - 300-220, scoreText, "Supercell-magic-webfont.ttf");
+    iShowText(WIDTH / 2 - 80, HEIGHT - 300-220, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf");
 
     sprintf(scoreText, "High Score: %d", highScore);
-    iShowText(WIDTH / 2 - 80, HEIGHT - 350-220, scoreText, "Supercell-magic-webfont.ttf");
+    iShowText(WIDTH / 2 - 80, HEIGHT - 350-220, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf");
 
     // Collision type
     const char *collisionMessages[] = {
@@ -322,7 +322,7 @@ void drawGameOver()
     if (Collision < 5)
     {
         iSetColor(255, 255, 0);
-        iShowText(WIDTH / 2 - 100, HEIGHT - 220-220, collisionMessages[Collision], "Supercell-magic-webfont.ttf");
+        iShowText(WIDTH / 2 - 100, HEIGHT - 220-220, collisionMessages[Collision], "assets/Fonts/Supercell-magic-webfont.ttf");
     }
 
     // Menu options
@@ -334,19 +334,19 @@ void drawGameOver()
         if (i == menuSelection)
         {
             iSetColor(255, 255, 0);
-            iShowText(WIDTH / 2 - 80, startY - i * 50-220, "> ", "Supercell-magic-webfont.ttf");
+            iShowText(WIDTH / 2 - 80, startY - i * 50-220, "> ", "assets/Fonts/Supercell-magic-webfont.ttf");
         }
         else
         {
             iSetColor(200, 200, 200);
         }
-        iShowText(WIDTH / 2 - 60, startY - i * 50-220, gameOverItems[i], "Supercell-magic-webfont.ttf");
+        iShowText(WIDTH / 2 - 60, startY - i * 50-220, gameOverItems[i], "assets/Fonts/Supercell-magic-webfont.ttf");
     }
 
     // Instructions
     iSetColor(150, 150, 150);
-    iShowText(WIDTH / 2 - 120, 100, "Use UP/DOWN arrows to navigate", "Supercell-magic-webfont.ttf");
-    iShowText(WIDTH / 2 - 80, 80, "Press ENTER to select", "Supercell-magic-webfont.ttf");
+    iShowText(WIDTH / 2 - 120, 100, "Use UP/DOWN arrows to navigate", "assets/Fonts/Supercell-magic-webfont.ttf");
+    iShowText(WIDTH / 2 - 80, 80, "Press ENTER to select", "assets/Fonts/Supercell-magic-webfont.ttf");
 }
 
 void SplashAnim()
@@ -1072,7 +1072,7 @@ void iDraw()
             if (splash.frame_id == 0)
                 splash.pos = {player.px - CELL, player.py - SLOPE * player.px};
             iShowLoadedImage(splash.pos.first, splash.pos.second, splash.frames[splash.frame_id]);
-            iShowLoadedImage(player.px, player.py - SLOPE * player.px - CELL/1.5 * splash.frame_id, &player.file[player.motion]);
+            iShowLoadedImage(player.px, player.py - SLOPE * player.px - CELL/2.75 * splash.frame_id, &player.file[player.motion]);
         }
 
         if (line[i].type == Water)
@@ -1121,10 +1121,10 @@ void iDraw()
         iSetColor(236, 219, 91);
         sprintf(scoreText, "%d", currentScore);
         // iSetLineWidth(6);
-        iShowText(CELL, HEIGHT - CELL * 5, scoreText, "Supercell-magic-webfont.ttf",40);
+        iShowText(CELL, HEIGHT - CELL * 5, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf",40);
         iSetColor(185, 171, 71);
         sprintf(scoreText, "High Score: %d", highScore);
-        iShowText(CELL, HEIGHT - CELL * 6, scoreText, "Supercell-magic-webfont.ttf");
+        iShowText(CELL, HEIGHT - CELL * 6, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf");
         // Draw custom mouse cursor (semi-transparent to indicate no interaction)
         iSetColor(255, 0, 0); // RGBA with alpha for transparency
         //iFilledCircle(mouseX, mouseY, 5);
