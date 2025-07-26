@@ -166,7 +166,7 @@ void drawMainMenu()
     // Title
     iSetColor(255, 255, 255);
     
-    iShowText(WIDTH / 2 - 100, HEIGHT - 100, "CROSSY ROAD LITE", "SacrificeDemo-8Ox1B.ttf");
+    iShowText(WIDTH / 2 - 100, HEIGHT - 100, "CROSSY ROAD LITE", "Supercell-magic-webfont.ttf");
 
     // Menu items
     const char *menuItems[] = {"Start New Game", /* "Resume Game", */ "Exit", "Contributors", "Instructions"};
@@ -177,7 +177,7 @@ void drawMainMenu()
         if (i == menuSelection)
         {
             iSetColor(0, 0, 0); // Yellow for selected item
-            iShowText(40, startY - i * 50, "> ","SacrificeDemo-8Ox1B.ttf");
+            iShowText(40, startY - i * 50, "> ","Supercell-magic-webfont.ttf");
         }
         else
         {
@@ -190,14 +190,14 @@ void drawMainMenu()
             iSetColor(10, 10, 10); // Darker gray for disabled
         }
 
-        iShowText(60, startY - i * 50, menuItems[i], "SacrificeDemo-8Ox1B.ttf");
+        iShowText(60, startY - i * 50, menuItems[i], "Supercell-magic-webfont.ttf");
     }
 
     // Instructions
-    iSetColor(150, 150, 150);
-    iShowText(20, startY - MENU_ITEMS * 50 - 20, "Use UP/DOWN arrows or mouse to navigate","SacrificeDemo-8Ox1B.ttf");
-    iShowText(60, startY - MENU_ITEMS * 50 - 40, "Press ENTER to select", "SacrificeDemo-8Ox1B.ttf");
-    iShowText(40, startY - MENU_ITEMS * 50 - 60, "Press ESC to pause during game", "SacrificeDemo-8Ox1B.ttf");
+    //iSetColor(150, 150, 150);
+    //iShowText(20, startY - MENU_ITEMS * 50 - 20, "Use UP/DOWN arrows or mouse to navigate","Supercell-magic-webfont.ttf");
+    //iShowText(60, startY - MENU_ITEMS * 50 - 40, "Press ENTER to select", "Supercell-magic-webfont.ttf");
+    //iShowText(40, startY - MENU_ITEMS * 50 - 60, "Press ESC to pause during game", "Supercell-magic-webfont.ttf");
 }
 
 void drawContributors()
@@ -206,32 +206,32 @@ void drawContributors()
 
     // Title
     iSetColor(255, 255, 255);
-    iShowText(WIDTH / 2 - 80, HEIGHT - 100, "CONTRIBUTORS","SacrificeDemo-8Ox1B.ttf");
+    iShowText(WIDTH / 2 - 100, HEIGHT - 100, "CONTRIBUTORS","Supercell-magic-webfont.ttf");
 
     // Contributors list
     const char *contributors[] = {
         
-        "1. Dipjyoti Das\nID:2405095\nCSE-24",
-        "2. Md Abdun Noor Nayef Mahdi\nID:2405091\nCSE-24",
+        "1. Dipjyoti Das >> ID:2405095 >> CSE-24",
+        "2. Md Abdun Noor Nayef Mahdi>>ID:2405091 >> CSE-24",
     "Supervisor: Anwarul Bashir Shuaib"};
     int startY = HEIGHT / 2 + 50;
 
     for (int i = 0; i < 3; i++)
     {
         iSetColor(200, 200, 200);
-        iShowText(WIDTH / 2 - 100, startY - i * 50, contributors[i], "SacrificeDemo-8Ox1B.ttf");
+        iShowText(WIDTH / 2 - 300, startY - i * 50, contributors[i], "Supercell-magic-webfont.ttf");
     }
 
     // Back option
     if (menuSelection == 0)
     {
         iSetColor(255, 255, 0); // Yellow for selected
-        iShowText(WIDTH / 2 - 80, startY - 3 * 50 - 50, "> Back","SacrificeDemo-8Ox1B.ttf");
+        iShowText(WIDTH / 2 - 80, startY - 3 * 50 - 50, "> Back","Supercell-magic-webfont.ttf");
     }
     else
     {
         iSetColor(200, 200, 200);
-        iShowText(WIDTH / 2 - 60, startY - 3 * 50 - 50, "Back", "SacrificeDemo-8Ox1B.ttf");
+        iShowText(WIDTH / 2 - 60, startY - 3 * 50 - 50, "Back", "Supercell-magic-webfont.ttf");
     }
 }
 
@@ -241,7 +241,7 @@ void drawInstructions()
 
     // Title
     iSetColor(255, 255, 255);
-    iShowText(WIDTH / 2 - 80, HEIGHT - 100, "INSTRUCTIONS", "SacrificeDemo-8Ox1B.ttf");
+    iShowText(WIDTH / 2 - 80, HEIGHT - 100, "INSTRUCTIONS", "Supercell-magic-webfont.ttf");
 
     // Instructions list
     const char *instructions[] = {
@@ -253,19 +253,19 @@ void drawInstructions()
     for (int i = 0; i < 3; i++)
     {
         iSetColor(150, 150, 150);
-        iShowText(WIDTH / 2 - 120, startY - i * 50, instructions[i], "SacrificeDemo-8Ox1B.ttf");
+        iShowText(WIDTH / 2 - 300, startY - i * 50, instructions[i], "Supercell-magic-webfont.ttf");
     }
 
     // Back option
     if (menuSelection == 0)
     {
         iSetColor(255, 255, 0); // Yellow for selected
-        iShowText(WIDTH / 2 - 80, startY - 3 * 50 - 50, "> Back", "SacrificeDemo-8Ox1B.ttf");
+        iShowText(WIDTH / 2 - 80, startY - 3 * 50 - 50, "> Back", "Supercell-magic-webfont.ttf");
     }
     else
     {
         iSetColor(200, 200, 200);
-        iShowText(WIDTH / 2 - 60, startY - 3 * 50 - 50, "Back", "SacrificeDemo-8Ox1B.ttf");
+        iShowText(WIDTH / 2 - 60, startY - 3 * 50 - 50, "Back", "Supercell-magic-webfont.ttf");
     }
 }
 
@@ -275,17 +275,17 @@ void drawPauseMenu()
 
     // Pause menu overlay
     iSetTransparentColor(255, 255, 255, 0.5);
-    iFilledRectangle(WIDTH / 2 - 150, HEIGHT / 2 - 100, 300, 200);
+    iFilledRectangle(WIDTH / 2 - 150, HEIGHT / 2 - 100, 450, 200);
 
     iSetColor(0, 0, 0);
-    iRectangle(WIDTH / 2 - 150, HEIGHT / 2 - 100, 300, 200);
+    iRectangle(WIDTH / 2 - 150, HEIGHT / 2 - 100, 450, 200);
 
     // Pause title
-    iShowText(WIDTH / 2 - 40, HEIGHT / 2 + 50, "PAUSED", "SacrificeDemo-8Ox1B.ttf");
+    iShowText(WIDTH / 2 - 40, HEIGHT / 2 + 50, "         PAUSED", "Supercell-magic-webfont.ttf");
 
     // Instructions
-    iShowText(WIDTH / 2 - 80, HEIGHT / 2, "Press ESC to resume", "SacrificeDemo-8Ox1B.ttf");
-    iShowText(WIDTH / 2 - 100, HEIGHT / 2 - 30, "Press END to quit to menu", "SacrificeDemo-8Ox1B.ttf");
+    iShowText(WIDTH / 2 - 80, HEIGHT / 2, "Press ESC to resume", "Supercell-magic-webfont.ttf");
+    iShowText(WIDTH / 2 - 100, HEIGHT / 2 - 30, "Press END to quit to menu", "Supercell-magic-webfont.ttf");
 }
 
 void drawGameOver()
@@ -299,17 +299,17 @@ void drawGameOver()
     iSetTransparentColor(0, 0, 0, 0.5);
     iFilledRectangle(WIDTH / 2 - 150, HEIGHT / 2 - 100, 300, 520);
     iSetColor(255, 0, 0);
-    iShowText(WIDTH / 2 - 80, HEIGHT - 100, "GAME OVER", "SacrificeDemo-8Ox1B.ttf");
+    iShowText(WIDTH / 2 - 80, HEIGHT - 100, "GAME OVER", "Supercell-magic-webfont.ttf");
 
     // Display final score and high score
     char scoreText[50];
     iSetColor(255, 255, 255);
 
     sprintf(scoreText, "Final Score: %d", finalScore);
-    iShowText(WIDTH / 2 - 80, HEIGHT - 300, scoreText, "SacrificeDemo-8Ox1B.ttf");
+    iShowText(WIDTH / 2 - 80, HEIGHT - 300, scoreText, "Supercell-magic-webfont.ttf");
 
     sprintf(scoreText, "High Score: %d", highScore);
-    iShowText(WIDTH / 2 - 80, HEIGHT - 350, scoreText, "SacrificeDemo-8Ox1B.ttf");
+    iShowText(WIDTH / 2 - 80, HEIGHT - 350, scoreText, "Supercell-magic-webfont.ttf");
 
     // Collision type
     const char *collisionMessages[] = {
@@ -322,7 +322,7 @@ void drawGameOver()
     if (Collision < 5)
     {
         iSetColor(255, 255, 0);
-        iShowText(WIDTH / 2 - 100, HEIGHT - 220, collisionMessages[Collision], "SacrificeDemo-8Ox1B.ttf");
+        iShowText(WIDTH / 2 - 100, HEIGHT - 220, collisionMessages[Collision], "Supercell-magic-webfont.ttf");
     }
 
     // Menu options
@@ -334,19 +334,19 @@ void drawGameOver()
         if (i == menuSelection)
         {
             iSetColor(255, 255, 0);
-            iShowText(WIDTH / 2 - 80, startY - i * 50, "> ", "SacrificeDemo-8Ox1B.ttf");
+            iShowText(WIDTH / 2 - 80, startY - i * 50, "> ", "Supercell-magic-webfont.ttf");
         }
         else
         {
             iSetColor(200, 200, 200);
         }
-        iShowText(WIDTH / 2 - 60, startY - i * 50, gameOverItems[i], "SacrificeDemo-8Ox1B.ttf");
+        iShowText(WIDTH / 2 - 60, startY - i * 50, gameOverItems[i], "Supercell-magic-webfont.ttf");
     }
 
     // Instructions
     iSetColor(150, 150, 150);
-    iShowText(WIDTH / 2 - 120, 100, "Use UP/DOWN arrows to navigate", "SacrificeDemo-8Ox1B.ttf");
-    iShowText(WIDTH / 2 - 80, 80, "Press ENTER to select", "SacrificeDemo-8Ox1B.ttf");
+    iShowText(WIDTH / 2 - 120, 100, "Use UP/DOWN arrows to navigate", "Supercell-magic-webfont.ttf");
+    iShowText(WIDTH / 2 - 80, 80, "Press ENTER to select", "Supercell-magic-webfont.ttf");
 }
 
 void SplashAnim()
@@ -1120,15 +1120,16 @@ void iDraw()
     }
 
     iShowLoadedImage(eagle.px, eagle.py, &EAGLE);
+
     if (currentGameState == PLAYING)
     {
         // Draw score in top-left corner
         iSetColor(31, 31, 31);
         sprintf(scoreText, "Score: %d", currentScore);
         // iSetLineWidth(6);
-        iShowText(CELL, HEIGHT - CELL * 4, scoreText, "SacrificeDemo-8Ox1B.ttf");
+        iShowText(CELL, HEIGHT - CELL * 5, scoreText, "Supercell-magic-webfont.ttf");
         sprintf(scoreText, "High Score: %d", highScore);
-        iShowText(CELL, HEIGHT - CELL * 6, scoreText, "SacrificeDemo-8Ox1B.ttf");
+        iShowText(CELL, HEIGHT - CELL * 6, scoreText, "Supercell-magic-webfont.ttf");
         // Draw custom mouse cursor (semi-transparent to indicate no interaction)
         iSetColor(255, 0, 0); // RGBA with alpha for transparency
         iFilledCircle(mouseX, mouseY, 5);
@@ -1541,3 +1542,4 @@ int main(int argc, char *argv[])
     iOpenWindow(WIDTH, HEIGHT, "Crossy Road Lite");
     return 0;
 }
+
