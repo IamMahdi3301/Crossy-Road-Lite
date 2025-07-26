@@ -1,5 +1,5 @@
 @echo off
-setlocal
+setlocal enabledelayedexpansion
 
 :: Set default source file if not provided
 if "%~1"=="" (
@@ -25,26 +25,47 @@ if exist "%RELEASE_DIR%" (
 
 REM Create the release folder
 mkdir "%RELEASE_DIR%"
+mkdir "obj"
 
+:: === Add icon via resource ===
 
-:: Compile the source file to an object file
-g++.exe -std=c++14 -w -fexceptions -g -I. -IOpenGL\\include -IOpenGL\\include\\SDL2 -IOpenGL\\include\\Freetype -c "%SOURCE_FILE%" -o obj\\opengl.o
+REM Create appicon.res if not already exists
+if exist "appicon.ico" (
+    echo Generating appicon.res from appicon.rc...
+    windres appicon.rc -O coff -o appicon.res
+    
+) else (
+    echo WARNING: appicon.ico not found. Skipping icon embedding.
+)
+
+:: === Compile source ===
+echo Compiling %SOURCE_FILE% to object file...
+
+g++.exe -std=c++14 -w -fexceptions -g -I. -IOpenGL\include -IOpenGL\include\SDL2 -IOpenGL\include\Freetype -c "%SOURCE_FILE%" -o obj\opengl.o
 
 if %ERRORLEVEL% neq 0 (
    echo Compilation failed.
    exit /b 1
 )
 
-echo Compiling %SOURCE_FILE% to object file...
+:: === Link final exe ===
+set "EXE_CMD=g++.exe -std=c++14 -static-libgcc -static-libstdc++ -LOpenGL\lib -o "%RELEASE_DIR%\game.exe" obj\opengl.o"
 
-g++.exe -std=c++14 -static-libgcc -static-libstdc++ -L.\\OpenGL\\lib -o "%RELEASE_DIR%\\game.exe" obj\\opengl.o -lmingw32 -lSDL2main -lSDL2 -lSDL2_mixer -lOPENGL32 -lfreeglut -lwinmm -lfreetype -mwindows
+if exist "obj\appicon.res" (
+    set "EXE_CMD=!EXE_CMD! obj\appicon.res"
+)
+
+set "EXE_CMD=!EXE_CMD! -lmingw32 -lSDL2main -lSDL2 -lSDL2_mixer -lOPENGL32 -lfreeglut -lwinmm -lfreetype -mwindows"
+
+echo Linking...
+call !EXE_CMD!
 
 if %ERRORLEVEL% neq 0 (
     echo Linking failed.
     exit /b 1
 )
 
-echo Finished building.
+echo Finished building with icon support.
 
 REM Copy all DLL files from bin to release folder
 xcopy /y /q "bin\*.dll" "%RELEASE_DIR%\"
@@ -52,7 +73,7 @@ xcopy /y /q "bin\*.dll" "%RELEASE_DIR%\"
 REM Copy the assets folder to the release folder
 xcopy /e /i /y "assets" "%RELEASE_DIR%\assets"
 
-REM Copy the assets folder to the release folder
+REM Copy the saves folder to the release folder
 xcopy /e /i /y "saves" "%RELEASE_DIR%\saves"
 
 endlocal
