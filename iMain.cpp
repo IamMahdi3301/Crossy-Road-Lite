@@ -117,13 +117,13 @@ void handleGameOver()
         {
 
             highScore = currentScore;
-            auto hfp = fopen("highestscore", "w");
+            auto hfp = fopen("saves/highestscore", "w");
             if (!hfp)
             {
 #ifdef _WIN32
                 // Remove read-only if present
-                //system("attrib highestscore");
-                hfp = fopen("highestscore", "w"); // Try again
+                //system("attrib saves/highestscore");
+                hfp = fopen("saves/highestscore", "w"); // Try again
 #endif
             }
 
@@ -132,13 +132,13 @@ void handleGameOver()
                 fprintf(hfp, "%lld", highScore);
                 fclose(hfp);
 #ifdef _WIN32
-                //system("attrib +h +r highestscore"); // Hide and protect again
+                //system("attrib +h +r saves/highestscore"); // Hide and protect again
 #endif
             }
             else
             {
                 perror("fopen failed");
-                std::cerr << "can't open highestscore in w mode\n";
+                std::cerr << "can't open saves/highestscore in w mode\n";
             }
         }
         finalScore = currentScore; // Use currentScore as finalScore
@@ -1191,7 +1191,7 @@ void iMouse(int button, int state, int mx, int my)
                         Audio::pauseAudio(Audio::ALL_CHANNELS);
                         Audio::cleanAudio();
                         // iCloseWindow();
-                        system("attrib +h +r highestscore");
+                        system("attrib +h +r saves/highestscore");
                         exit(0);
                         break;
                     case 2: // Contributors
@@ -1389,7 +1389,7 @@ void iKeyboard(unsigned char key, int state)
             case 1: // Exit
                 Audio::pauseAudio(Audio::ALL_CHANNELS);
                 Audio::cleanAudio();
-                system("attrib +h +r highestscore");
+                system("attrib +h +r saves/highestscore");
                 exit(0);
                 // iCloseWindow();its getting (exit code: -1073741819)
                 break;
@@ -1516,11 +1516,11 @@ int main(int argc, char *argv[])
     iInitializeFont();
     Mix_AllocateChannels(Audio::MAX_AUDIO_CHANNEL);
     glutInit(&argc, argv);
-    auto hfp = fopen("highestscore", "r");
+    auto hfp = fopen("saves/highestscore", "r");
     if (hfp)
     {
         fscanf(hfp, "%lld", &highScore);
-        system("attrib  +h highestscore");
+        system("attrib  +h saves/highestscore");
         fclose(hfp);
     }
     load_resources();
