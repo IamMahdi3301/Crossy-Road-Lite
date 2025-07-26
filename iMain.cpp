@@ -157,12 +157,12 @@ void handleGameOver()
 
 void drawMainMenu()
 {
-    iClear();
-    Audio::pauseAudio(Audio::ALL_CHANNELS);
-    Audio::pauseAudio(Audio::MUSIC_CHANNEL);
+    //iClear();
+    //Audio::pauseAudio(Audio::ALL_CHANNELS);
+    //Audio::pauseAudio(Audio::MUSIC_CHANNEL);
     // Display image at the top center
-    iShowLoadedImage(WIDTH / 2 - 500, HEIGHT / 2 - 800, &MENU_IMAGE); // Adjust size/position as needed
-
+    //iShowLoadedImage(WIDTH / 2 - 500, HEIGHT / 2 - 800, &MENU_IMAGE); // Adjust size/position as needed
+    iShowImage((WIDTH -777)/ 2 , (HEIGHT -412)/ 2 , "assets\\images\\title.png");
     // Title
     iSetColor(255, 255, 255);
     
@@ -297,19 +297,19 @@ void drawGameOver()
 
     // Game Over title
     iSetTransparentColor(0, 0, 0, 0.5);
-    iFilledRectangle(WIDTH / 2 - 150, HEIGHT / 2 - 100, 300, 520);
+    iFilledRectangle(WIDTH / 2 - 150-CELL, HEIGHT / 2 - 100-220, 520, 520);
     iSetColor(255, 0, 0);
-    iShowText(WIDTH / 2 - 80, HEIGHT - 100, "GAME OVER", "Supercell-magic-webfont.ttf");
+    iShowText(WIDTH / 2 - 80-95, HEIGHT - 100-220+CELL, "GAME OVER", "Supercell-magic-webfont.ttf",50);
 
     // Display final score and high score
     char scoreText[50];
     iSetColor(255, 255, 255);
 
     sprintf(scoreText, "Final Score: %d", finalScore);
-    iShowText(WIDTH / 2 - 80, HEIGHT - 300, scoreText, "Supercell-magic-webfont.ttf");
+    iShowText(WIDTH / 2 - 80, HEIGHT - 300-220, scoreText, "Supercell-magic-webfont.ttf");
 
     sprintf(scoreText, "High Score: %d", highScore);
-    iShowText(WIDTH / 2 - 80, HEIGHT - 350, scoreText, "Supercell-magic-webfont.ttf");
+    iShowText(WIDTH / 2 - 80, HEIGHT - 350-220, scoreText, "Supercell-magic-webfont.ttf");
 
     // Collision type
     const char *collisionMessages[] = {
@@ -322,7 +322,7 @@ void drawGameOver()
     if (Collision < 5)
     {
         iSetColor(255, 255, 0);
-        iShowText(WIDTH / 2 - 100, HEIGHT - 220, collisionMessages[Collision], "Supercell-magic-webfont.ttf");
+        iShowText(WIDTH / 2 - 100, HEIGHT - 220-220, collisionMessages[Collision], "Supercell-magic-webfont.ttf");
     }
 
     // Menu options
@@ -334,13 +334,13 @@ void drawGameOver()
         if (i == menuSelection)
         {
             iSetColor(255, 255, 0);
-            iShowText(WIDTH / 2 - 80, startY - i * 50, "> ", "Supercell-magic-webfont.ttf");
+            iShowText(WIDTH / 2 - 80, startY - i * 50-220, "> ", "Supercell-magic-webfont.ttf");
         }
         else
         {
             iSetColor(200, 200, 200);
         }
-        iShowText(WIDTH / 2 - 60, startY - i * 50, gameOverItems[i], "Supercell-magic-webfont.ttf");
+        iShowText(WIDTH / 2 - 60, startY - i * 50-220, gameOverItems[i], "Supercell-magic-webfont.ttf");
     }
 
     // Instructions
@@ -687,9 +687,10 @@ void Horizontal::scrollpx()
 
 void motion()
 {
+    
     if (keypress.empty())
         return;
-    if (Collision)
+    if (Collision || currentGameState==GameState::MAIN_MENU)
     {
         keypress.pop();
         return;
@@ -796,7 +797,7 @@ void stopwatch()
 {
     TIME = (TIME + 1LL) % INT32_MAX;
     Audio::processDeletionQueue();
-    if (!Collision)
+    if (!Collision && currentGameState!=MAIN_MENU)
     {
         Vertical::V = (Vertical::V + 1) % Vertical::scroll_factor;
         player.py -= 1.0 * CELL / Vertical::scroll_factor;
@@ -1008,21 +1009,14 @@ void iDraw()
     char scoreText[50];
     iClear();
 
-    if (currentGameState == MAIN_MENU)
-    {
-        drawMainMenu();
-        // Draw custom mouse cursor (solid red for menu)
-        iSetColor(255, 0, 0);
-        iFilledCircle(mouseX, mouseY, 5);
-        return;
-    }
+    
 
     if (currentGameState == CONTRIBUTORS)
     {
         drawContributors();
         // Draw custom mouse cursor (solid red for menu)
         iSetColor(255, 0, 0);
-        iFilledCircle(mouseX, mouseY, 5);
+        //iFilledCircle(mouseX, mouseY, 5);
         return;
     }
 
@@ -1031,7 +1025,7 @@ void iDraw()
         drawInstructions();
         // Draw custom mouse cursor (solid red for menu)
         iSetColor(255, 0, 0);
-        iFilledCircle(mouseX, mouseY, 5);
+        //iFilledCircle(mouseX, mouseY, 5);
         return;
     }
 
@@ -1078,7 +1072,7 @@ void iDraw()
             if (splash.frame_id == 0)
                 splash.pos = {player.px - CELL, player.py - SLOPE * player.px};
             iShowLoadedImage(splash.pos.first, splash.pos.second, splash.frames[splash.frame_id]);
-            iShowLoadedImage(player.px, player.py - SLOPE * player.px - 7 * splash.frame_id, &player.file[player.motion]);
+            iShowLoadedImage(player.px, player.py - SLOPE * player.px - CELL/1.5 * splash.frame_id, &player.file[player.motion]);
         }
 
         if (line[i].type == Water)
@@ -1124,22 +1118,23 @@ void iDraw()
     if (currentGameState == PLAYING)
     {
         // Draw score in top-left corner
-        iSetColor(31, 31, 31);
-        sprintf(scoreText, "Score: %d", currentScore);
+        iSetColor(236, 219, 91);
+        sprintf(scoreText, "%d", currentScore);
         // iSetLineWidth(6);
-        iShowText(CELL, HEIGHT - CELL * 5, scoreText, "Supercell-magic-webfont.ttf");
+        iShowText(CELL, HEIGHT - CELL * 5, scoreText, "Supercell-magic-webfont.ttf",40);
+        iSetColor(185, 171, 71);
         sprintf(scoreText, "High Score: %d", highScore);
         iShowText(CELL, HEIGHT - CELL * 6, scoreText, "Supercell-magic-webfont.ttf");
         // Draw custom mouse cursor (semi-transparent to indicate no interaction)
         iSetColor(255, 0, 0); // RGBA with alpha for transparency
-        iFilledCircle(mouseX, mouseY, 5);
+        //iFilledCircle(mouseX, mouseY, 5);
     }
     if (currentGameState == PAUSED)
     {
         drawPauseMenu();
         // Draw custom mouse cursor (solid red, though no mouse interaction)
         iSetColor(255, 0, 0);
-        iFilledCircle(mouseX, mouseY, 5);
+        //iFilledCircle(mouseX, mouseY, 5);
         // return;
     }
     if (currentGameState == GAME_OVER)
@@ -1147,8 +1142,16 @@ void iDraw()
         drawGameOver();
         // Draw custom mouse cursor (solid red for menu)
         iSetColor(255, 0, 0);
-        iFilledCircle(mouseX, mouseY, 5);
+        //iFilledCircle(mouseX, mouseY, 5);
         // return;
+    }
+    if (currentGameState == MAIN_MENU)
+    {
+        drawMainMenu();
+        // Draw custom mouse cursor (solid red for menu)
+        iSetColor(255, 0, 0);
+        //iFilledCircle(mouseX, mouseY, 5);
+        return;
     }
 }
 
@@ -1168,14 +1171,15 @@ void iMouse(int button, int state, int mx, int my)
             int startY = 300;
             for (int i = 0; i < MENU_ITEMS; i++)
             {
-                if (isMouseOverMenuItem(mx, my, i, startY, 50, 40, 240))
+                if (isMouseOverMenuItem(mx, my, i, startY, 50, 40,240))
                 {
                     // Audio::playAudio(Audio::ALL_CHANNELS,false,MIX_MAX_VOLUME,resources[resource_id].second[9].c_str());
                     menuSelection = i;
                     switch (menuSelection)
                     {
                     case 0: // Start New Game
-                        startNewGame();
+                    currentGameState=PLAYING;
+                        //startNewGame();
                         break;
                     /* case 1: // Resume Game
                         if (currentGameState != MAIN_MENU)
@@ -1206,10 +1210,10 @@ void iMouse(int button, int state, int mx, int my)
         }
         else if (currentGameState == GAME_OVER)
         {
-            int startY = HEIGHT / 2 + 50;
+            int startY = HEIGHT / 2 + 50-220;
             for (int i = 0; i < 3; i++)
             {
-                if (isMouseOverMenuItem(mx, my, i, startY, 50, WIDTH / 2 - 80, WIDTH / 2 + 120))
+                if (isMouseOverMenuItem(mx, my, i, startY, 50, WIDTH / 2 - 60, WIDTH / 2 + 120))
                 {
                     // Audio::playAudio(Audio::ALL_CHANNELS,false,MIX_MAX_VOLUME,resources[resource_id].second[9].c_str());
                     menuSelection = i;
@@ -1219,6 +1223,7 @@ void iMouse(int button, int state, int mx, int my)
                         startNewGame();
                         break;
                     case 1: // Main Menu
+                        startNewGame();
                         currentGameState = MAIN_MENU;
                         menuSelection = 0;
                         break;
@@ -1239,6 +1244,7 @@ void iMouse(int button, int state, int mx, int my)
             if (isMouseOverMenuItem(mx, my, 0, startY, 50, WIDTH / 2 - 80, WIDTH / 2 + 120))
             {
                 menuSelection = 0; // Back
+                startNewGame();
                 currentGameState = MAIN_MENU;
                 menuSelection = 0; // Reset to first menu item
                                    // Audio::playAudio(1, false, MIX_MAX_VOLUME/2, resources[resource_id].second[9].c_str());
@@ -1250,6 +1256,7 @@ void iMouse(int button, int state, int mx, int my)
             if (isMouseOverMenuItem(mx, my, 0, startY, 50, WIDTH / 2 - 80, WIDTH / 2 + 120))
             {
                 menuSelection = 0; // Back
+                startNewGame();
                 currentGameState = MAIN_MENU;
                 menuSelection = 0; // Reset to first menu item
                                    // Audio::playAudio(1, false, MIX_MAX_VOLUME/2, resources[resource_id].second[9].c_str());
@@ -1370,7 +1377,8 @@ void iKeyboard(unsigned char key, int state)
             switch (menuSelection)
             {
             case 0: // Start New Game
-                startNewGame();
+                //startNewGame();
+                currentGameState=PLAYING;
                 break;
             /* case 1: // Resume Game
                 if (currentGameState != MAIN_MENU)
@@ -1404,6 +1412,7 @@ void iKeyboard(unsigned char key, int state)
                 startNewGame();
                 break;
             case 1: // Main Menu
+            startNewGame();
                 currentGameState = MAIN_MENU;
                 break;
             case 2: // Exit
@@ -1417,6 +1426,7 @@ void iKeyboard(unsigned char key, int state)
         {
             if (menuSelection == 0)
             { // Back
+                startNewGame();
                 currentGameState = MAIN_MENU;
                 menuSelection = 0; // Reset to first menu item
             }
@@ -1530,7 +1540,7 @@ int main(int argc, char *argv[])
     Timer::Eagle = iSetTimer(1.0 * eagle.speed_ms / eagle.fps, EagleSpawn);
     player.motion = Up;
 
-    // Audio::playAudio(Audio::MUSIC_CHANNEL, true, MIX_MAX_VOLUME, resources[resource_id].second[3].c_str());
+     Audio::playAudio(Audio::MUSIC_CHANNEL, true, MIX_MAX_VOLUME, resources[resource_id].second[3].c_str());
 
     Timer::stopwatch = iSetTimer(1000 / FPS, stopwatch);
     Timer::HScrollpx = iSetTimer(std::max(1.0, PLAYER_SPEED / 10.0), Horizontal::scrollpx);
@@ -1538,6 +1548,7 @@ int main(int argc, char *argv[])
     iPauseTimer(Timer::HScrollpx);
     iSetTimer(round(700.0 / splash.frames.size()), SplashAnim);
     Timer::player = iSetTimer(PLAYER_SPEED / (player_fps), motion);
+    
     currentGameState = MAIN_MENU;
     iOpenWindow(WIDTH, HEIGHT, "Crossy Road Lite");
     return 0;
