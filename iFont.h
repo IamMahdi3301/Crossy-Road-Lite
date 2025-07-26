@@ -79,7 +79,7 @@ uint32_t getNextUTF8Codepoint(const char *&p)
     return codepoint;
 }
 
-void iShowText(double x, double y, const char *text, const char *fontPath, int fontSize = 48)
+void iShowText(double x, double y, const char *text, const char *fontPath, int fontSize = 20)
 {
     if (!g_ftInitialized)
     {
