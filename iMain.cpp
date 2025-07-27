@@ -146,7 +146,7 @@ void handleGameOver()
         // Pause all timers
         // iPauseTimer(Timer::stopwatch);
         iPauseTimer(Timer::player);
-        iPauseTimer(Timer::Eagle);
+        //iPauseTimer(Timer::Eagle);
 
         // Stop music
         // Audio::pauseAudio(Audio::MUSIC_CHANNEL);
@@ -513,12 +513,12 @@ void Draw::street(int i, bool bg_only = false)
         {
             if (line[i].dir == 1)
             {
-                if ((int)round(x[0]) + length == -CELL * 3)
+                if ((int)round(x[0]) + length == -CELL * 3 && currentGameState!=PAUSED)
                     Audio::playAudio(Audio::ALL_CHANNELS, false, MIX_MAX_VOLUME / 2, resources[resource_id].second[line[i].speed_factor < 2 ? 5 : 6].c_str());
             }
             else
             {
-                if ((int)round(x[0]) == WIDTH + CELL * 3)
+                if ((int)round(x[0]) == WIDTH + CELL * 3  && currentGameState!=PAUSED)
                 {
                     Audio::playAudio(Audio::ALL_CHANNELS, false, MIX_MAX_VOLUME / 2, resources[resource_id].second[line[i].speed_factor < 2 ? 5 : 6].c_str());
                 }
@@ -1121,6 +1121,9 @@ void iDraw()
         iSetColor(236, 219, 91);
         sprintf(scoreText, "%d", currentScore);
         // iSetLineWidth(6);
+        iSetColor(0,0,0);
+        iShowText(CELL, HEIGHT - CELL * 5, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf",45);
+        iSetColor(235, 235, 235);
         iShowText(CELL, HEIGHT - CELL * 5, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf",40);
         iSetColor(185, 171, 71);
         sprintf(scoreText, "High Score: %d", highScore);

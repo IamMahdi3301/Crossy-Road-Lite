@@ -18,7 +18,7 @@ const int ROW = 1.0 * HEIGHT / CELL;
 #define PLAYER_SPEED 120 // ms
 const int player_fps = 12;
 #define DEG(x) (x) * M_PI / 180
-#define SHADOW false
+
 #include <unordered_map>
 #include <string>
 #include <SDL.h>
@@ -26,7 +26,11 @@ const int player_fps = 12;
 #include <cstdio>
 #include <functional>
 
-#define SHADOW_COLOR 69, 69, 69
+
+struct Button{
+    int px, py, dx, dy;
+    Image img;
+};
 
 namespace Audio
 {
