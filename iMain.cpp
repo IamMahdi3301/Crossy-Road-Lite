@@ -1298,7 +1298,7 @@ void iMouseMove(int mx, int my)
     }
     else if (currentGameState == GAME_OVER)
     {
-        int startY = HEIGHT / 2 + 50;
+        int startY = HEIGHT / 2 + 50-220;
         bool found = false;
         for (int i = 0; i < 3; i++)
         {
