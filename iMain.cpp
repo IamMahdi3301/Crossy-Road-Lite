@@ -1347,13 +1347,13 @@ void iDraw()
         onLog = 0;
     if (Dual && onLog2 && (player2.y >= 0 && line[player2.y].type != Water || player2.y >= 0 && line[player2.y].dir == 0))
         onLog2 = 0;
-    if (player.y >= 0 && collision(player.y))
+    if (player.y > 2 && collision(player.y))
     {
         if (Collision != FlownWithLog && Collision != Drown)
             player.motion = Dead;
         player.frame_no = 0;
     }
-    if (player2.y >= 0 && collision2(player2.y))
+    if (player2.y > 2 && collision2(player2.y))
     {
         if (Collision2 != FlownWithLog && Collision2 != Drown)
             player2.motion = Dead;
@@ -1785,7 +1785,7 @@ void iKeyboard(unsigned char key, int state)
                 startNewGame();
                 break;
             case 1: // Main Menu
-                Dual=false;
+                Dual = false;
                 startNewGame();
                 currentGameState = MAIN_MENU;
                 break;
