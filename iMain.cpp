@@ -181,7 +181,7 @@ void drawMainMenu()
         int fontSize = (i == menuSelection) ? enlargedFontSize : baseFontSize;
         if (i == menuSelection)
         {
-            iSetColor(0, 0, 255); // Yellow for selected item
+            iSetColor(255, 255, 0); // Yellow for selected item
             iShowText(40, startY - i * 50, "> ", "assets/Fonts/Supercell-magic-webfont.ttf", fontSize);
         }
 
