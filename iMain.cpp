@@ -229,8 +229,9 @@ void drawMainMenu()
 
 void drawContributors()
 {
-    iClear();
-
+    //iClear();
+    iSetTransparentColor(0,0,0,0.5);
+    iFilledRectangle(0,0,WIDTH,HEIGHT);
     // Title
     iSetColor(255, 255, 255);
     iShowText(WIDTH / 2 - 100, HEIGHT - 100, "CONTRIBUTORS", "assets/Fonts/Supercell-magic-webfont.ttf");
@@ -264,8 +265,9 @@ void drawContributors()
 
 void drawInstructions()
 {
-    iClear();
-
+    //iClear();
+    iSetTransparentColor(0,0,0,0.5);
+    iFilledRectangle(0,0,WIDTH,HEIGHT);
     // Title
     iSetColor(255, 255, 255);
     iShowText(WIDTH / 2 - 80, HEIGHT - 100, "INSTRUCTIONS", "assets/Fonts/Supercell-magic-webfont.ttf");
@@ -751,6 +753,7 @@ void Horizontal::scrollpx() // not called in Dual
 void motion()
 {
 
+    if(currentGameState!=PLAYING) return;
     if (keypress.empty())
         return;
     if (Collision || currentGameState == GameState::MAIN_MENU)
@@ -858,6 +861,7 @@ void motion()
 void motion2()
 {
 
+    if(currentGameState!=PLAYING) return;
     if (!Dual)
         return;
     if (keypress2.empty())
@@ -968,7 +972,7 @@ void stopwatch()
 {
     TIME = (TIME + 1LL) % INT32_MAX;
     Audio::processDeletionQueue();
-    if ((!((Dual && Collision && Collision2) || (!Dual && Collision))) && currentGameState != MAIN_MENU)
+    if ((!((Dual && Collision && Collision2) || (!Dual && Collision))) && currentGameState == PLAYING)
     {
         Vertical::V = (Vertical::V + 1) % Vertical::scroll_factor;
         player.py -= 1.0 * CELL / Vertical::scroll_factor;
@@ -1325,20 +1329,6 @@ void iDraw()
     char scoreText[50];
     iClear();
 
-    if (currentGameState == CONTRIBUTORS)
-    {
-        drawContributors();
-        iSetColor(255, 0, 0);
-        return;
-    }
-
-    if (currentGameState == INSTRUCTIONS)
-    {
-        drawInstructions();
-        iSetColor(255, 0, 0);
-
-        return;
-    }
 
     if (Collision)
     {
@@ -1517,6 +1507,21 @@ void iDraw()
     if (currentGameState == MAIN_MENU)
     {
         drawMainMenu();
+    }
+    
+    if (currentGameState == CONTRIBUTORS)
+    {
+        drawContributors();
+        iSetColor(255, 0, 0);
+        return;
+    }
+
+    if (currentGameState == INSTRUCTIONS)
+    {
+        drawInstructions();
+        iSetColor(255, 0, 0);
+
+        return;
     }
     if (Dual)
     {
