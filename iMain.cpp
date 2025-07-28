@@ -1434,19 +1434,19 @@ void iDraw()
         }
         if (Dual && i == player2.y && Collision2 && !deathSound2 && Collision2 != Eagle && Collision2 != FlownWithLog)
         {
-            Audio::playAudio(2, false, 64, resources[resource_id].second[2].c_str());
+            Audio::playAudio(11, false, 64, resources[resource_id].second[10].c_str());
             deathSound2 = 1;
         }
 
         if (Dual && i == player2.y && Collision2 == Drown && !drown_sound2)
         {
-            Audio::playAudio(4, false, MIX_MAX_VOLUME, resources[resource_id].second[8].c_str());
+            Audio::playAudio(12, false, MIX_MAX_VOLUME, resources[resource_id].second[8].c_str());
             drown_sound2 = true;
         }
 
         if (Dual && i == player2.y && Collision2 == FlownWithLog && !flown_sound2)
         {
-            Audio::playAudio(3, false, MIX_MAX_VOLUME, resources[resource_id].second[7].c_str());
+            Audio::playAudio(13, false, MIX_MAX_VOLUME, resources[resource_id].second[7].c_str());
             flown_sound2 = true;
         }
 
@@ -1455,7 +1455,7 @@ void iDraw()
             if (currentGameState == PLAYING && player2.frame_no == 1)
             {
                 int rnd = ranint(0, 5);
-                Audio::playAudio(2, false, 20, resources[resource_id].second[rnd < 1 ? 0 : 1].c_str());
+                Audio::playAudio(11, false, 20, resources[resource_id].second[10].c_str());
             }
             iShowLoadedImage((int)player2.px, (int)(player2.py - SLOPE * player2.px) + (int)(9 * (player2.frame_no <= (int)round(player_fps / 2.0) ? player2.frame_no : player_fps - player2.frame_no)), &player2.file[player2.motion]);
         }
@@ -1909,7 +1909,7 @@ void EagleSpawn2()
     {
         if (!deathSound2)
         {
-            Audio::playAudio(2, false, 64, resources[resource_id].second[2].c_str());
+            Audio::playAudio(11, false, 64, resources[resource_id].second[10].c_str());
             deathSound2 = 1;
         }
     }
