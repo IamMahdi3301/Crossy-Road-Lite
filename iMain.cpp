@@ -199,19 +199,25 @@ void drawMainMenu()
     const char *menuItems[] = {"Single Player", "Exit", "Contributors", "Instructions", "Dual"};
     int startY = 300; // Position in lower left corner
 
+    const int basefontsize = 20;
+    const int enlargedfontsize = 27;
+ 
+
     for (int i = 0; i < MENU_ITEMS; i++)
     {
+        int fontSize = (i == menuSelection) ? enlargedfontsize : basefontsize;
+
         if (i == menuSelection)
         {
             iSetColor(255, 255, 0);
-            iShowText(40, startY - i * 50, "> ", "assets/Fonts/Supercell-magic-webfont.ttf");
+            iShowText(40, startY - i * 50, "> ", "assets/Fonts/Supercell-magic-webfont.ttf",fontSize);
         }
         else
         {
             iSetColor(00, 00, 00); // Gray for unselected items
         }
 
-        iShowText(60, startY - i * 50, menuItems[i], "assets/Fonts/Supercell-magic-webfont.ttf");
+        iShowText(60, startY - i * 50, menuItems[i], "assets/Fonts/Supercell-magic-webfont.ttf",fontSize);
     }
 
     // Instructions
@@ -363,18 +369,23 @@ void drawGameOver()
     const char *gameOverItems[] = {"Play Again", "Main Menu", "Exit"};
     int startY = HEIGHT / 2 + 50;
 
+    const int basefontsize = 20;
+    const int enlargedfontsize = 27;
+
     for (int i = 0; i < 3; i++)
     {
+        int fontSize = (i == menuSelection) ? enlargedfontsize : basefontsize;
+
         if (i == menuSelection)
         {
             iSetColor(255, 255, 0);
-            iShowText(WIDTH / 2 - 80, startY - i * 50 - 220, "> ", "assets/Fonts/Supercell-magic-webfont.ttf");
+            iShowText(WIDTH / 2 - 80, startY - i * 50 - 220, "> ", "assets/Fonts/Supercell-magic-webfont.ttf",fontSize);
         }
         else
         {
             iSetColor(200, 200, 200);
         }
-        iShowText(WIDTH / 2 - 60, startY - i * 50 - 220, gameOverItems[i], "assets/Fonts/Supercell-magic-webfont.ttf");
+        iShowText(WIDTH / 2 - 60, startY - i * 50 - 220, gameOverItems[i], "assets/Fonts/Supercell-magic-webfont.ttf",fontSize);
     }
 
     // Instructions
