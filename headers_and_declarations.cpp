@@ -462,7 +462,7 @@ std::mt19937 rng(std::chrono::steady_clock::now().time_since_epoch().count());
 template <typename Iterator>
 void shuffle_(Iterator start, Iterator ends)
 {
-    std::shuffle(start, end, rng);
+    std::shuffle(start, ends, rng);
 }
 int ranint(int l, int r)
 {

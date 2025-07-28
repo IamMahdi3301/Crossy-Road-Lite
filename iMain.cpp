@@ -1,10 +1,6 @@
 #include "headers_and_declarations.cpp"
 /*
-Dual
-Dual button in main menu
-Central line divider
-Option for dual
-Pictures of duck
+got exit code -1073740771. Check code 
 */
 enum GameState
 {
@@ -570,13 +566,13 @@ void Draw::street(int i, bool bg_only = false)
             if (line[i].dir == 1)
             {
                 if ((int)round(x[0]) + length == -CELL * 3 && currentGameState != PAUSED)
-                    Audio::playAudio(Audio::ALL_CHANNELS, false, MIX_MAX_VOLUME / 2, resources[resource_id].second[line[i].speed_factor < 2 ? 5 : 6].c_str());
+                    Audio::playAudio(Audio::ALL_CHANNELS, false, MIX_MAX_VOLUME / 4, resources[resource_id].second[line[i].speed_factor < 2 ? 5 : 6].c_str());
             }
             else
             {
                 if ((int)round(x[0]) == WIDTH + CELL * 3 && currentGameState != PAUSED)
                 {
-                    Audio::playAudio(Audio::ALL_CHANNELS, false, MIX_MAX_VOLUME / 2, resources[resource_id].second[line[i].speed_factor < 2 ? 5 : 6].c_str());
+                    Audio::playAudio(Audio::ALL_CHANNELS, false, MIX_MAX_VOLUME / 4, resources[resource_id].second[line[i].speed_factor < 2 ? 5 : 6].c_str());
                 }
             }
 
@@ -1050,7 +1046,7 @@ bool collision(int line_i)
     }
     else if (line[line_i].type == Water)
     {
-        if (player.x < 1 || player.x >= WIDTH / (CELL)-1)
+        if (line[line_i].dir==-1 &&  player.x < 1 || line[line_i].dir==1 &&  player.x >= WIDTH / (CELL)-1)
         {
             Collision = FlownWithLog;
             return true;
@@ -1176,7 +1172,7 @@ bool collision2(int line_i)
     }
     else if (line[line_i].type == Water)
     {
-        if (player2.x < 1 || player2.x >= WIDTH / (CELL)-1)
+        if (line[line_i].dir==-1 && player2.x < 1 || line[line_i].dir==1 && player2.x >= WIDTH / (CELL)-1)
         {
             Collision2 = FlownWithLog;
             return true;
@@ -1423,7 +1419,7 @@ void iDraw()
             flown_sound = true;
         }
 
-        if (i == player.y && Collision != Drown && eagle.py >= player.py - CELL)
+        if (i == player.y && Collision != Drown && Collision!=FlownWithLog && eagle.py >= player.py - CELL)
         {
             if (currentGameState == PLAYING && player.frame_no == 1)
             {
@@ -1450,7 +1446,7 @@ void iDraw()
             flown_sound2 = true;
         }
 
-        if (Dual && i == player2.y && Collision2 != Drown && eagle2.py >= player2.py - CELL)
+        if (Dual && i == player2.y && Collision2 != Drown && Collision2!=FlownWithLog && eagle2.py >= player2.py - CELL)
         {
             if (currentGameState == PLAYING && player2.frame_no == 1)
             {
