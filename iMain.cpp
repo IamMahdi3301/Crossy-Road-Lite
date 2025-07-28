@@ -8,7 +8,6 @@ enum GameState
     GAME_OVER,
     CONTRIBUTORS,
     INSTRUCTIONS
-
 };
 
 GameState currentGameState = MAIN_MENU;
@@ -26,17 +25,18 @@ int mouseX = 0, mouseY = 0;
 
 void resetGame()
 {
-    
     currentScore = 0;
     drown_sound = false;
     flown_sound = false;
     eagle_sound = false;
+
     // Reset player position
     player.x = WIDTH / (2 * CELL);
     player.y = start_y;
     player.px = CELL * player.x;
     player.py = CELL * start_y;
     eagle.py = HEIGHT + CELL * 4;
+
     splash.frame_id = 0;
     // Reset collision state
     Collision = None;
@@ -57,7 +57,7 @@ void resetGame()
 
     // Reset timers
     Vertical::V = 0;
-    Vertical::scroll_factor=Vertical::base_factor;
+    Vertical::scroll_factor = Vertical::base_factor;
     Horizontal::H = 0;
     TIME = 0;
 
@@ -73,9 +73,11 @@ void pauseGame()
     if (currentGameState == PLAYING)
     {
         currentGameState = PAUSED;
+
         iPauseTimer(Timer::stopwatch);
         iPauseTimer(Timer::player);
         iPauseTimer(Timer::Eagle);
+
         Audio::pauseAudio(Audio::ALL_CHANNELS);
         Audio::pauseAudio(Audio::MUSIC_CHANNEL);
     }
@@ -89,6 +91,7 @@ void resumeGame()
         iResumeTimer(Timer::stopwatch);
         iResumeTimer(Timer::player);
         iResumeTimer(Timer::Eagle);
+
         Audio::resumeAudio(Audio::ALL_CHANNELS);
         Audio::resumeAudio(Audio::MUSIC_CHANNEL);
     }
@@ -115,14 +118,13 @@ void handleGameOver()
         currentGameState = GAME_OVER;
         if (currentScore > highScore)
         {
-
             highScore = currentScore;
             auto hfp = fopen("saves/highestscore", "w");
             if (!hfp)
             {
 #ifdef _WIN32
                 // Remove read-only if present
-                //system("attrib saves/highestscore");
+                // system("attrib saves/highestscore");
                 hfp = fopen("saves/highestscore", "w"); // Try again
 #endif
             }
@@ -132,7 +134,7 @@ void handleGameOver()
                 fprintf(hfp, "%lld", highScore);
                 fclose(hfp);
 #ifdef _WIN32
-                //system("attrib +h +r saves/highestscore"); // Hide and protect again
+                // system("attrib +h +r saves/highestscore"); // Hide and protect again
 #endif
             }
             else
@@ -146,7 +148,7 @@ void handleGameOver()
         // Pause all timers
         // iPauseTimer(Timer::stopwatch);
         iPauseTimer(Timer::player);
-        //iPauseTimer(Timer::Eagle);
+        // iPauseTimer(Timer::Eagle);
 
         // Stop music
         // Audio::pauseAudio(Audio::MUSIC_CHANNEL);
@@ -157,31 +159,35 @@ void handleGameOver()
 
 void drawMainMenu()
 {
-    //iClear();
-    //Audio::pauseAudio(Audio::ALL_CHANNELS);
-    //Audio::pauseAudio(Audio::MUSIC_CHANNEL);
-    // Display image at the top center
-    //iShowLoadedImage(WIDTH / 2 - 500, HEIGHT / 2 - 800, &MENU_IMAGE); // Adjust size/position as needed
-    iShowImage((WIDTH -777)/ 2 , (HEIGHT -412)/ 2 , "assets\\images\\title.png");
+    // iClear();
+    // Audio::pauseAudio(Audio::ALL_CHANNELS);
+    // Audio::pauseAudio(Audio::MUSIC_CHANNEL);
+    //  Display image at the top center
+    // iShowLoadedImage(WIDTH / 2 - 500, HEIGHT / 2 - 800, &MENU_IMAGE); // Adjust size/position as needed
+    iShowImage((WIDTH - 777) / 2, (HEIGHT - 412) / 2, "assets\\images\\title.png");
     // Title
     iSetColor(255, 255, 255);
-    
+
     iShowText(WIDTH / 2 - 100, HEIGHT - 100, "CROSSY ROAD LITE", "assets/Fonts/Supercell-magic-webfont.ttf");
 
     // Menu items
-    const char *menuItems[] = {"Start New Game", /* "Resume Game", */ "Exit", "Contributors", "Instructions"};
-    int startY = 300; // Position in lower left corner
+    const char *menuItems[] = {"Start New Game", "Exit", "Contributors", "Instructions"};
+    int startY = 300;                // Position in lower left corner
+    const int baseFontSize = 20;     // Base font size for menu items
+    const int enlargedFontSize = 27; // Enlarged font size for selected item
 
     for (int i = 0; i < MENU_ITEMS; i++)
     {
+        int fontSize = (i == menuSelection) ? enlargedFontSize : baseFontSize;
         if (i == menuSelection)
         {
-            iSetColor(0, 0, 0); // Yellow for selected item
-            iShowText(40, startY - i * 50, "> ","assets/Fonts/Supercell-magic-webfont.ttf");
+            iSetColor(0, 0, 255); // Yellow for selected item
+            iShowText(40, startY - i * 50, "> ", "assets/Fonts/Supercell-magic-webfont.ttf", fontSize);
         }
+
         else
         {
-            iSetColor(00, 00, 00); // Gray for unselected items
+            iSetColor(0, 0, 0); // Gray for unselected items
         }
 
         // Don't show resume if we haven't started a game yet
@@ -190,15 +196,10 @@ void drawMainMenu()
             iSetColor(10, 10, 10); // Darker gray for disabled
         }
 
-        iShowText(60, startY - i * 50, menuItems[i], "assets/Fonts/Supercell-magic-webfont.ttf");
+        iShowText(60, startY - i * 50, menuItems[i], "assets/Fonts/Supercell-magic-webfont.ttf", fontSize);
     }
-
-    // Instructions
-    //iSetColor(150, 150, 150);
-    //iShowText(20, startY - MENU_ITEMS * 50 - 20, "Use UP/DOWN arrows or mouse to navigate","assets/Fonts/Supercell-magic-webfont.ttf");
-    //iShowText(60, startY - MENU_ITEMS * 50 - 40, "Press ENTER to select", "assets/Fonts/Supercell-magic-webfont.ttf");
-    //iShowText(40, startY - MENU_ITEMS * 50 - 60, "Press ESC to pause during game", "assets/Fonts/Supercell-magic-webfont.ttf");
 }
+
 
 void drawContributors()
 {
@@ -206,14 +207,15 @@ void drawContributors()
 
     // Title
     iSetColor(255, 255, 255);
-    iShowText(WIDTH / 2 - 100, HEIGHT - 100, "CONTRIBUTORS","assets/Fonts/Supercell-magic-webfont.ttf");
+    iShowText(WIDTH / 2 - 100, HEIGHT - 100, "CONTRIBUTORS", "assets/Fonts/Supercell-magic-webfont.ttf");
 
     // Contributors list
     const char *contributors[] = {
-        
+
         "1. Dipjyoti Das >> ID:2405095 >> CSE-24",
         "2. Md Abdun Noor Nayef Mahdi>>ID:2405091 >> CSE-24",
-    "Supervisor: Anwarul Bashir Shuaib"};
+        "Supervisor: Anwarul Bashir Shuaib"};
+
     int startY = HEIGHT / 2 + 50;
 
     for (int i = 0; i < 3; i++)
@@ -226,13 +228,16 @@ void drawContributors()
     if (menuSelection == 0)
     {
         iSetColor(255, 255, 0); // Yellow for selected
-        iShowText(WIDTH / 2 - 80, startY - 3 * 50 - 50, "> Back","assets/Fonts/Supercell-magic-webfont.ttf");
+        iShowText(WIDTH / 2 - 80, startY - 3 * 50 - 50, "> Back", "assets/Fonts/Supercell-magic-webfont.ttf");
     }
+
     else
     {
         iSetColor(200, 200, 200);
         iShowText(WIDTH / 2 - 60, startY - 3 * 50 - 50, "Back", "assets/Fonts/Supercell-magic-webfont.ttf");
+ 
     }
+
 }
 
 void drawInstructions()
@@ -244,10 +249,13 @@ void drawInstructions()
     iShowText(WIDTH / 2 - 80, HEIGHT - 100, "INSTRUCTIONS", "assets/Fonts/Supercell-magic-webfont.ttf");
 
     // Instructions list
-    const char *instructions[] = {
+    const char *instructions[] = 
+    {
+
         "Use UP/DOWN/LEFT/RIGHT arrows to navigate",
         "Press ENTER to select",
         "Press ESC to pause during game"};
+
     int startY = HEIGHT / 2 + 50;
 
     for (int i = 0; i < 3; i++)
@@ -262,11 +270,13 @@ void drawInstructions()
         iSetColor(255, 255, 0); // Yellow for selected
         iShowText(WIDTH / 2 - 80, startY - 3 * 50 - 50, "> Back", "assets/Fonts/Supercell-magic-webfont.ttf");
     }
+
     else
     {
         iSetColor(200, 200, 200);
         iShowText(WIDTH / 2 - 60, startY - 3 * 50 - 50, "Back", "assets/Fonts/Supercell-magic-webfont.ttf");
     }
+
 }
 
 void drawPauseMenu()
@@ -290,57 +300,71 @@ void drawPauseMenu()
 
 void drawGameOver()
 {
-    // iClear();
+    // iClear(nigga);
 
     // Display image at the top center
     // iShowLoadedImage(WIDTH/2 , HEIGHT , &MENU_IMAGE); // Adjust size/position as needed
 
     // Game Over title
     iSetTransparentColor(0, 0, 0, 0.5);
-    iFilledRectangle(WIDTH / 2 - 150-CELL, HEIGHT / 2 - 100-220, 520, 520);
+    iFilledRectangle(WIDTH / 2 - 150 - CELL, HEIGHT / 2 - 100 - 220, 520, 520);
     iSetColor(255, 0, 0);
-    iShowText(WIDTH / 2 - 80-95, HEIGHT - 100-220+CELL, "GAME OVER", "assets/Fonts/Supercell-magic-webfont.ttf",50);
+    iShowText(WIDTH / 2 - 80 - 95, HEIGHT - 100 - 220 + CELL, "GAME OVER", "assets/Fonts/Supercell-magic-webfont.ttf", 50);
 
     // Display final score and high score
     char scoreText[50];
     iSetColor(255, 255, 255);
 
     sprintf(scoreText, "Final Score: %d", finalScore);
-    iShowText(WIDTH / 2 - 80, HEIGHT - 300-220, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf");
+    iShowText(WIDTH / 2 - 80, HEIGHT - 300 - 220, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf");
 
     sprintf(scoreText, "High Score: %d", highScore);
-    iShowText(WIDTH / 2 - 80, HEIGHT - 350-220, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf");
+    iShowText(WIDTH / 2 - 80, HEIGHT - 350 - 220, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf");
 
     // Collision type
-    const char *collisionMessages[] = {
+    const char *collisionMessages[] = 
+    {
         "No collision",
         "You drowned!",
         "Swept away by the current!",
         "Caught by an eagle!",
-        "Hit by a vehicle!"};
+        "Hit by a vehicle!"
+    };
 
     if (Collision < 5)
     {
         iSetColor(255, 255, 0);
-        iShowText(WIDTH / 2 - 100, HEIGHT - 220-220, collisionMessages[Collision], "assets/Fonts/Supercell-magic-webfont.ttf");
+        iShowText(WIDTH / 2 - 100, HEIGHT - 220 - 220, collisionMessages[Collision], "assets/Fonts/Supercell-magic-webfont.ttf");
     }
 
     // Menu options
-    const char *gameOverItems[] = {"Play Again", "Main Menu", "Exit"};
+    const char *gameOverItems[] = {
+        "Play Again",
+        "Main Menu",
+        "Exit"
+
+        };
+
     int startY = HEIGHT / 2 + 50;
+
+    const int base_fontSize = 22;
+    const int enlarged_fontSize = 29;
 
     for (int i = 0; i < 3; i++)
     {
+        int fontSize = (i == menuSelection) ? enlarged_fontSize : base_fontSize;
         if (i == menuSelection)
         {
             iSetColor(255, 255, 0);
-            iShowText(WIDTH / 2 - 80, startY - i * 50-220, "> ", "assets/Fonts/Supercell-magic-webfont.ttf");
+            iShowText(WIDTH / 2 - 80, startY - i * 50 - 220, "> ", "assets/Fonts/Supercell-magic-webfont.ttf", fontSize);
         }
+
         else
         {
             iSetColor(200, 200, 200);
         }
-        iShowText(WIDTH / 2 - 60, startY - i * 50-220, gameOverItems[i], "assets/Fonts/Supercell-magic-webfont.ttf");
+
+        iShowText(WIDTH / 2 - 60, startY - i * 50 - 220, gameOverItems[i], "assets/Fonts/Supercell-magic-webfont.ttf", fontSize);
     }
 
     // Instructions
@@ -357,7 +381,6 @@ void SplashAnim()
     if (splash.frame_id == splash.frames.size())
 
     {
-
         handleGameOver();
         return;
     }
@@ -381,8 +404,8 @@ void Draw::water(int i, bool bg_only = false)
     {
         int length = data.size * CELL;
         int pos_x = data.pospx + 1.0 * Horizontal::H * CELL / player_fps;
-        if (line[i].dir == 1)
-            pos_x = pos_x - length;
+        if (line[i].dir == 1) pos_x = pos_x - length;
+
         int pos_y = CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor;
 
         if (data.size != LILYPAD_LEN)
@@ -394,8 +417,8 @@ void Draw::water(int i, bool bg_only = false)
         x.insert(x.end(), {(double)pos_x, (double)(pos_x + length), (double)(pos_x + length), (double)pos_x});
         y.insert(y.end(), {(double)(pos_y - SLOPE * x[0]), (double)(pos_y - SLOPE * x[1]), (double)(pos_y + 10 - SLOPE * x[2]), (double)(pos_y + 10 - SLOPE * x[3])});
 
-        if (data.size != LILYPAD_LEN)
-            iFilledPolygon(x.data(), y.data(), 4);
+        if (data.size != LILYPAD_LEN) iFilledPolygon(x.data(), y.data(), 4);
+
 
         std::vector<double> x1 = {x[0], x[1], x[2] + 20, x[3] + 20};
         std::vector<double> y1 = {pos_y + 10 - SLOPE * x1[0], pos_y + 10 - SLOPE * x1[1], (double)(pos_y + CELL - SLOPE * x1[2]), (double)(pos_y + CELL - SLOPE * x1[3])};
@@ -418,6 +441,7 @@ void Draw::water(int i, bool bg_only = false)
 
 void Draw::field(int i)
 {
+
     std::vector<double> x = {(double)0, (double)WIDTH, (double)WIDTH, 0.0};
     std::vector<double> y = {(double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor), (double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor - SLOPE * x[1]), (double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor + CELL - SLOPE * x[2]), (double)(CELL * i - 1.0 * Vertical::V * CELL / Vertical::scroll_factor + CELL)};
 
@@ -513,12 +537,12 @@ void Draw::street(int i, bool bg_only = false)
         {
             if (line[i].dir == 1)
             {
-                if ((int)round(x[0]) + length == -CELL * 3 && currentGameState!=PAUSED)
+                if ((int)round(x[0]) + length == -CELL * 3 && currentGameState != PAUSED)
                     Audio::playAudio(Audio::ALL_CHANNELS, false, MIX_MAX_VOLUME / 2, resources[resource_id].second[line[i].speed_factor < 2 ? 5 : 6].c_str());
             }
             else
             {
-                if ((int)round(x[0]) == WIDTH + CELL * 3  && currentGameState!=PAUSED)
+                if ((int)round(x[0]) == WIDTH + CELL * 3 && currentGameState != PAUSED)
                 {
                     Audio::playAudio(Audio::ALL_CHANNELS, false, MIX_MAX_VOLUME / 2, resources[resource_id].second[line[i].speed_factor < 2 ? 5 : 6].c_str());
                 }
@@ -626,31 +650,39 @@ void Spawn::water(int line_i)
 
     if (line_i > 0 && line[line_i - 1].type == Water && line[line_i - 1].dir == dir)
         line[line_i].speed_factor = std::max(std::max(2.0, (ranint(5, 9)) * FPS / 20.0), (FPS / 20.0) * (line[line_i].speed_factor - 1 - ranint(0, 3)));
-    else
-        line[line_i].speed_factor = std::max(2.0, (ranint(5, 9)) * FPS / 20.0);
+    
+    else line[line_i].speed_factor = std::max(2.0, (ranint(5, 9)) * FPS / 20.0);
+
 
     line[line_i].data.clear();
     line[line_i].data.resize(ranint(25, 100));
 
     int rnd = ranint(0, 7);
+
     if (rnd > 1 || (line_i > 0 && line[line_i - 1].type == Water && line[line_i - 1].dir == 0))
     {
         int pos = ranint(0, WIDTH / CELL);
+
         for (int i = 0; i < line[line_i].data.size(); i++)
         {
             int len = CAR_LEN + (ranint(0, 2)) * CAR_LEN;
             line[line_i].data[i] = {pos, (double)pos * CELL, len};
             pos += -dir * (len + 2 + ranint(0, 3));
         }
+
     }
+
     else
+
     {
         line[line_i].dir = 0;
         int pos = WIDTH / (2 * CELL) - 1 - ranint(0, 3);
         for (int j = line[line_i].data.size() / 2 - 1; j >= 0; j--)
         {
+
             line[line_i].data[j] = {pos, (double)pos * CELL, LILYPAD_LEN};
             pos -= (4 * LILYPAD_LEN + ranint(0, 5));
+
         }
         pos = WIDTH / (2 * CELL);
         int i;
@@ -677,6 +709,7 @@ void Horizontal::scrollpx()
             Horizontal::scroll(1);
         Horizontal::H = (Horizontal::H + 1) % player_fps;
     }
+
     else
     {
         if (cnt == 0)
@@ -685,12 +718,12 @@ void Horizontal::scrollpx()
     }
 }
 
+
 void motion()
 {
-    
     if (keypress.empty())
         return;
-    if (Collision || currentGameState==GameState::MAIN_MENU)
+    if (Collision || currentGameState == GameState::MAIN_MENU)
     {
         keypress.pop();
         return;
@@ -730,6 +763,7 @@ void motion()
         if (cnt == 0)
             player.x++;
     }
+
     else if (currentDirection == Left)
     {
         player.motion = Left;
@@ -797,7 +831,7 @@ void stopwatch()
 {
     TIME = (TIME + 1LL) % INT32_MAX;
     Audio::processDeletionQueue();
-    if (!Collision && currentGameState!=MAIN_MENU)
+    if (!Collision && currentGameState != MAIN_MENU)
     {
         Vertical::V = (Vertical::V + 1) % Vertical::scroll_factor;
         player.py -= 1.0 * CELL / Vertical::scroll_factor;
@@ -827,9 +861,14 @@ bool collision(int line_i)
     }
     int id;
     if (line[line_i].dir == 1)
+    {
         id = std::upper_bound(line[line_i].data.begin(), line[line_i].data.end(), player.x, greater()) - line[line_i].data.begin() - 1;
+    }
+
     else
+    { 
         id = std::upper_bound(line[line_i].data.begin(), line[line_i].data.end(), player.x, less()) - line[line_i].data.begin() - 1;
+    }
 
     if (id < 0)
     {
@@ -843,6 +882,7 @@ bool collision(int line_i)
             else
                 return false;
         }
+
         else
         {
             if (line[line_i].dir == -1 && id < line[line_i].data.size() && (player.px + CELL) - line[line_i].data[id + 1].pospx > 10)
@@ -871,6 +911,7 @@ bool collision(int line_i)
             else
                 return false;
         }
+
         else
         {
             if ((id < line[line_i].data.size() && player.x + 1 == line[line_i].data[id + 1].pos) || (player.x < line[line_i].data[id].pos + line[line_i].data[id].size && player.x >= line[line_i].data[id].pos))
@@ -882,6 +923,7 @@ bool collision(int line_i)
                 return false;
         }
     }
+
     else if (line[line_i].type == Water)
     {
         if (player.x < 1 || player.x >= WIDTH / (CELL)-1)
@@ -898,12 +940,14 @@ bool collision(int line_i)
                 onLog = line[line_i].speed_factor * line[line_i].dir;
                 return false;
             }
+
             else
             {
                 Collision = Drown;
                 return true;
             }
         }
+
         else
         {
             if ((player.x <= line[line_i].data[id].pos + line[line_i].data[id].size && player.x >= line[line_i].data[id].pos))
@@ -920,20 +964,25 @@ bool collision(int line_i)
                 onLog = line[line_i].speed_factor * line[line_i].dir;
                 return false;
             }
+
             else if (id + 1 < line[line_i].data.size() && (player.px + CELL) - line[line_i].data[id + 1].pospx > 10)
             {
                 player.x++;
                 onLog = line[line_i].speed_factor * line[line_i].dir;
                 return false;
             }
+
             else
             {
                 Collision = Drown;
                 return true;
             }
         }
+
     }
+
     return false;
+
 }
 
 void Spawn::all(int line_i, bool isFirstLine = false)
@@ -991,6 +1040,7 @@ void Horizontal::scroll(int x)
             }
         }
     }
+
     else
     {
         for (int i = 0; i < line.size(); i++)
@@ -1009,14 +1059,12 @@ void iDraw()
     char scoreText[50];
     iClear();
 
-    
-
     if (currentGameState == CONTRIBUTORS)
     {
         drawContributors();
         // Draw custom mouse cursor (solid red for menu)
         iSetColor(255, 0, 0);
-        //iFilledCircle(mouseX, mouseY, 5);
+        // iFilledCircle(mouseX, mouseY, 5);
         return;
     }
 
@@ -1025,7 +1073,7 @@ void iDraw()
         drawInstructions();
         // Draw custom mouse cursor (solid red for menu)
         iSetColor(255, 0, 0);
-        //iFilledCircle(mouseX, mouseY, 5);
+        // iFilledCircle(mouseX, mouseY, 5);
         return;
     }
 
@@ -1072,7 +1120,7 @@ void iDraw()
             if (splash.frame_id == 0)
                 splash.pos = {player.px - CELL, player.py - SLOPE * player.px};
             iShowLoadedImage(splash.pos.first, splash.pos.second, splash.frames[splash.frame_id]);
-            iShowLoadedImage(player.px, player.py - SLOPE * player.px - CELL/2.75 * splash.frame_id, &player.file[player.motion]);
+            iShowLoadedImage(player.px, player.py - SLOPE * player.px - CELL / 2.75 * splash.frame_id, &player.file[player.motion]);
         }
 
         if (line[i].type == Water)
@@ -1121,39 +1169,39 @@ void iDraw()
         iSetColor(236, 219, 91);
         sprintf(scoreText, "%d", currentScore);
         // iSetLineWidth(6);
-        iSetColor(0,0,0);
-        iShowText(CELL, HEIGHT - CELL * 5, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf",45);
+        iSetColor(0, 0, 0);
+        iShowText(CELL, HEIGHT - CELL * 5, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf", 45);
         iSetColor(235, 235, 235);
-        iShowText(CELL, HEIGHT - CELL * 5, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf",40);
+        iShowText(CELL, HEIGHT - CELL * 5, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf", 40);
         iSetColor(185, 171, 71);
         sprintf(scoreText, "High Score: %d", highScore);
         iShowText(CELL, HEIGHT - CELL * 6, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf");
         // Draw custom mouse cursor (semi-transparent to indicate no interaction)
         iSetColor(255, 0, 0); // RGBA with alpha for transparency
-        //iFilledCircle(mouseX, mouseY, 5);
+        // iFilledCircle(mouseX, mouseY, 5);
     }
     if (currentGameState == PAUSED)
     {
         drawPauseMenu();
         // Draw custom mouse cursor (solid red, though no mouse interaction)
         iSetColor(255, 0, 0);
-        //iFilledCircle(mouseX, mouseY, 5);
-        // return;
+        // iFilledCircle(mouseX, mouseY, 5);
+        //  return;
     }
     if (currentGameState == GAME_OVER)
     {
         drawGameOver();
         // Draw custom mouse cursor (solid red for menu)
         iSetColor(255, 0, 0);
-        //iFilledCircle(mouseX, mouseY, 5);
-        // return;
+        // iFilledCircle(mouseX, mouseY, 5);
+        //  return;
     }
     if (currentGameState == MAIN_MENU)
     {
         drawMainMenu();
         // Draw custom mouse cursor (solid red for menu)
         iSetColor(255, 0, 0);
-        //iFilledCircle(mouseX, mouseY, 5);
+        // iFilledCircle(mouseX, mouseY, 5);
         return;
     }
 }
@@ -1174,15 +1222,15 @@ void iMouse(int button, int state, int mx, int my)
             int startY = 300;
             for (int i = 0; i < MENU_ITEMS; i++)
             {
-                if (isMouseOverMenuItem(mx, my, i, startY, 50, 40,240))
+                if (isMouseOverMenuItem(mx, my, i, startY, 50, 40, 240))
                 {
                     // Audio::playAudio(Audio::ALL_CHANNELS,false,MIX_MAX_VOLUME,resources[resource_id].second[9].c_str());
                     menuSelection = i;
                     switch (menuSelection)
                     {
                     case 0: // Start New Game
-                    currentGameState=PLAYING;
-                        //startNewGame();
+                        currentGameState = PLAYING;
+                        // startNewGame();
                         break;
                     /* case 1: // Resume Game
                         if (currentGameState != MAIN_MENU)
@@ -1190,6 +1238,7 @@ void iMouse(int button, int state, int mx, int my)
                             resumeGame();
                         }
                         break; */
+
                     case 1: // Exit
                         Audio::pauseAudio(Audio::ALL_CHANNELS);
                         Audio::cleanAudio();
@@ -1197,23 +1246,29 @@ void iMouse(int button, int state, int mx, int my)
                         system("attrib +h +r saves/highestscore");
                         exit(0);
                         break;
+
+
                     case 2: // Contributors
                         currentGameState = CONTRIBUTORS;
                         menuSelection = 0; // Reset for "Back" option
                         break;
+
+
                     case 3: // Instructions
                         currentGameState = INSTRUCTIONS;
                         menuSelection = 0; // Reset for "Back" option
                         break;
+
                     }
                     // Audio::playAudio(1, false, MIX_MAX_VOLUME/2, resources[resource_id].second[0].c_str());
                     break;
+
                 }
             }
         }
         else if (currentGameState == GAME_OVER)
         {
-            int startY = HEIGHT / 2 + 50-220;
+            int startY = HEIGHT / 2 + 50 - 220;
             for (int i = 0; i < 3; i++)
             {
                 if (isMouseOverMenuItem(mx, my, i, startY, 50, WIDTH / 2 - 60, WIDTH / 2 + 120))
@@ -1225,16 +1280,21 @@ void iMouse(int button, int state, int mx, int my)
                     case 0: // Play Again
                         startNewGame();
                         break;
+
+
                     case 1: // Main Menu
                         startNewGame();
                         currentGameState = MAIN_MENU;
                         menuSelection = 0;
                         break;
+
+
                     case 2: // Exit
                         Audio::pauseAudio(Audio::ALL_CHANNELS);
                         Audio::cleanAudio();
                         iCloseWindow();
                         break;
+
                     }
                     // Audio::playAudio(1, false, MIX_MAX_VOLUME/2, resources[resource_id].second[0].c_str());
                     break;
@@ -1253,7 +1313,7 @@ void iMouse(int button, int state, int mx, int my)
                                    // Audio::playAudio(1, false, MIX_MAX_VOLUME/2, resources[resource_id].second[9].c_str());
             }
         }
-        else if (currentGameState == INSTRUCTIONS)
+        else if(currentGameState == INSTRUCTIONS)
         {
             int startY = HEIGHT / 2 + 50 - 3 * 50 - 50;
             if (isMouseOverMenuItem(mx, my, 0, startY, 50, WIDTH / 2 - 80, WIDTH / 2 + 120))
@@ -1291,14 +1351,16 @@ void iMouseMove(int mx, int my)
                 break;
             }
         }
+
         if (!found && menuSelection != -1)
         {
             menuSelection = -1; // No selection if not over any item
         }
     }
+
     else if (currentGameState == GAME_OVER)
     {
-        int startY = HEIGHT / 2 + 50-220;
+        int startY = HEIGHT / 2 + 50 - 220;
         bool found = false;
         for (int i = 0; i < 3; i++)
         {
@@ -1313,11 +1375,15 @@ void iMouseMove(int mx, int my)
                 break;
             }
         }
+
+
         if (!found && menuSelection != -1)
         {
             menuSelection = -1; // No selection if not over any item
         }
     }
+
+
     else if (currentGameState == CONTRIBUTORS)
     {
         int startY = HEIGHT / 2 + 50 - 3 * 50 - 50;
@@ -1329,11 +1395,15 @@ void iMouseMove(int mx, int my)
                 // Audio::playAudio(1, false, MIX_MAX_VOLUME/2, resources[resource_id].second[9].c_str());
             }
         }
+
+
         else if (menuSelection != -1)
         {
             menuSelection = -1; // No selection
         }
     }
+
+
     else if (currentGameState == INSTRUCTIONS)
     {
         int startY = HEIGHT / 2 + 50 - 3 * 50 - 50;
@@ -1345,6 +1415,8 @@ void iMouseMove(int mx, int my)
                 // Audio::playAudio(1, false, MIX_MAX_VOLUME/2, resources[resource_id].second[9].c_str());
             }
         }
+
+
         else if (menuSelection != -1)
         {
             menuSelection = -1; // No selection
@@ -1380,9 +1452,11 @@ void iKeyboard(unsigned char key, int state)
             switch (menuSelection)
             {
             case 0: // Start New Game
-                //startNewGame();
-                currentGameState=PLAYING;
+                // startNewGame();
+                currentGameState = PLAYING;
                 break;
+
+
             /* case 1: // Resume Game
                 if (currentGameState != MAIN_MENU)
                 {
@@ -1396,10 +1470,14 @@ void iKeyboard(unsigned char key, int state)
                 exit(0);
                 // iCloseWindow();its getting (exit code: -1073741819)
                 break;
+
+
             case 2: // Contributors
                 currentGameState = CONTRIBUTORS;
                 menuSelection = 0; // Reset for "Back" option
                 break;
+
+
             case 3: // Instructions
                 currentGameState = INSTRUCTIONS;
                 menuSelection = 0; // Reset for "Back" option
@@ -1414,15 +1492,20 @@ void iKeyboard(unsigned char key, int state)
             case 0: // Play Again
                 startNewGame();
                 break;
+
+
             case 1: // Main Menu
-            startNewGame();
+                startNewGame();
                 currentGameState = MAIN_MENU;
                 break;
+
+
             case 2: // Exit
                 Audio::pauseAudio(Audio::ALL_CHANNELS);
                 Audio::cleanAudio();
                 iCloseWindow();
                 break;
+
             }
         }
         else if (currentGameState == CONTRIBUTORS || currentGameState == INSTRUCTIONS)
@@ -1465,10 +1548,13 @@ void iSpecialKeyboard(unsigned char key, int state)
 
     if (key == GLUT_KEY_UP)
         keypress.push(Up);
+
     else if (key == GLUT_KEY_DOWN)
         keypress.push(Down);
+
     else if (key == GLUT_KEY_RIGHT)
         keypress.push(Right);
+        
     else if (key == GLUT_KEY_LEFT)
         keypress.push(Left);
 
@@ -1483,7 +1569,6 @@ void iSpecialKeyboard(unsigned char key, int state)
 
 void EagleSpawn()
 {
-
     if (Collision != Eagle)
         return;
 
@@ -1514,7 +1599,6 @@ void EagleSpawn()
 
 int main(int argc, char *argv[])
 {
-
     Audio::initAudio();
     iInitializeFont();
     Mix_AllocateChannels(Audio::MAX_AUDIO_CHANNEL);
@@ -1543,7 +1627,7 @@ int main(int argc, char *argv[])
     Timer::Eagle = iSetTimer(1.0 * eagle.speed_ms / eagle.fps, EagleSpawn);
     player.motion = Up;
 
-     Audio::playAudio(Audio::MUSIC_CHANNEL, true, MIX_MAX_VOLUME, resources[resource_id].second[3].c_str());
+    Audio::playAudio(Audio::MUSIC_CHANNEL, true, MIX_MAX_VOLUME, resources[resource_id].second[3].c_str());
 
     Timer::stopwatch = iSetTimer(1000 / FPS, stopwatch);
     Timer::HScrollpx = iSetTimer(std::max(1.0, PLAYER_SPEED / 10.0), Horizontal::scrollpx);
@@ -1551,9 +1635,8 @@ int main(int argc, char *argv[])
     iPauseTimer(Timer::HScrollpx);
     iSetTimer(round(700.0 / splash.frames.size()), SplashAnim);
     Timer::player = iSetTimer(PLAYER_SPEED / (player_fps), motion);
-    
+
     currentGameState = MAIN_MENU;
     iOpenWindow(WIDTH, HEIGHT, "Crossy Road Lite");
     return 0;
 }
-
