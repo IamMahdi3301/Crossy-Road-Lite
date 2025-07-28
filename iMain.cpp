@@ -1,5 +1,11 @@
 #include "headers_and_declarations.cpp"
-
+/*
+Dual
+Dual button in main menu
+Central line divider
+Option for dual
+Pictures of duck
+*/
 enum GameState
 {
     MAIN_MENU,
@@ -7,41 +13,58 @@ enum GameState
     PAUSED,
     GAME_OVER,
     CONTRIBUTORS,
-    INSTRUCTIONS
+    INSTRUCTIONS,
 
 };
-
+bool Dual = false;
 GameState currentGameState = MAIN_MENU;
 
 int menuSelection = 0;
-const int MENU_ITEMS = 4;
+const int MENU_ITEMS = 5;
 
 bool gameOverSoundPlayed = false;
 int finalScore = 0;
-
+// score for player 2
 int currentScore = 0;
+int currentScore2 = 0;
 long long highScore = 0;
 
 int mouseX = 0, mouseY = 0;
 
 void resetGame()
 {
-    
+
     currentScore = 0;
+    currentScore2 = 0;
     drown_sound = false;
+    drown_sound2 = false;
     flown_sound = false;
+    flown_sound2 = false;
     eagle_sound = false;
+    eagle_sound2 = false;
     // Reset player position
-    player.x = WIDTH / (2 * CELL);
+    if(Dual)
+    player.x = 3 * WIDTH / (4 * CELL);
+    else player.x =  WIDTH / (2* CELL);
     player.y = start_y;
     player.px = CELL * player.x;
     player.py = CELL * start_y;
+    player2.x = WIDTH / (4 * CELL);
+    player2.y = start_y;
+    player2.px = CELL * player2.x;
+    player2.py = CELL * start_y;
     eagle.py = HEIGHT + CELL * 4;
+    eagle2.py = HEIGHT + CELL * 4;
     splash.frame_id = 0;
+    splash2.frame_id = 0;
     // Reset collision state
     Collision = None;
+    Collision2 = None;
     onLog = 0;
+    onLog2 = 0;
+
     deathSound = false;
+    deathSound2 = false;
     gameOverSoundPlayed = false;
 
     // Clear movement queue
@@ -49,15 +72,20 @@ void resetGame()
     {
         keypress.pop();
     }
-
+    while (!keypress2.empty())
+    {
+        keypress2.pop();
+    }
     // Reset animation states
     isAnim = false;
+    isAnim2 = false;
     player.motion = Up;
+    player2.motion = Up;
     player.frame_no = 0;
-
+    player2.frame_no = 0;
     // Reset timers
     Vertical::V = 0;
-    Vertical::scroll_factor=Vertical::base_factor;
+    Vertical::scroll_factor = Vertical::base_factor;
     Horizontal::H = 0;
     TIME = 0;
 
@@ -76,6 +104,11 @@ void pauseGame()
         iPauseTimer(Timer::stopwatch);
         iPauseTimer(Timer::player);
         iPauseTimer(Timer::Eagle);
+        if (Dual)
+        {
+            iPauseTimer(Timer::player2);
+            iPauseTimer(Timer::Eagle2);
+        }
         Audio::pauseAudio(Audio::ALL_CHANNELS);
         Audio::pauseAudio(Audio::MUSIC_CHANNEL);
     }
@@ -89,6 +122,11 @@ void resumeGame()
         iResumeTimer(Timer::stopwatch);
         iResumeTimer(Timer::player);
         iResumeTimer(Timer::Eagle);
+        if (Dual)
+        {
+            iResumeTimer(Timer::player2);
+            iResumeTimer(Timer::Eagle2);
+        }
         Audio::resumeAudio(Audio::ALL_CHANNELS);
         Audio::resumeAudio(Audio::MUSIC_CHANNEL);
     }
@@ -103,7 +141,11 @@ void startNewGame()
     iResumeTimer(Timer::stopwatch);
     iResumeTimer(Timer::player);
     iResumeTimer(Timer::Eagle);
-
+    if (Dual)
+    {
+        iResumeTimer(Timer::player2);
+        iResumeTimer(Timer::Eagle2);
+    }
     // Start background music
     Audio::playAudio(Audio::MUSIC_CHANNEL, true, MIX_MAX_VOLUME, resources[resource_id].second[3].c_str());
 }
@@ -121,9 +163,8 @@ void handleGameOver()
             if (!hfp)
             {
 #ifdef _WIN32
-                // Remove read-only if present
-                //system("attrib saves/highestscore");
-                hfp = fopen("saves/highestscore", "w"); // Try again
+
+                hfp = fopen("saves/highestscore", "w");
 #endif
             }
 
@@ -131,9 +172,6 @@ void handleGameOver()
             {
                 fprintf(hfp, "%lld", highScore);
                 fclose(hfp);
-#ifdef _WIN32
-                //system("attrib +h +r saves/highestscore"); // Hide and protect again
-#endif
             }
             else
             {
@@ -143,13 +181,9 @@ void handleGameOver()
         }
         finalScore = currentScore; // Use currentScore as finalScore
 
-        // Pause all timers
-        // iPauseTimer(Timer::stopwatch);
         iPauseTimer(Timer::player);
-        //iPauseTimer(Timer::Eagle);
-
-        // Stop music
-        // Audio::pauseAudio(Audio::MUSIC_CHANNEL);
+        if (Dual)
+            iPauseTimer(Timer::player2);
 
         menuSelection = 0; // Reset menu selection
     }
@@ -157,47 +191,37 @@ void handleGameOver()
 
 void drawMainMenu()
 {
-    //iClear();
-    //Audio::pauseAudio(Audio::ALL_CHANNELS);
-    //Audio::pauseAudio(Audio::MUSIC_CHANNEL);
-    // Display image at the top center
-    //iShowLoadedImage(WIDTH / 2 - 500, HEIGHT / 2 - 800, &MENU_IMAGE); // Adjust size/position as needed
-    iShowImage((WIDTH -777)/ 2 , (HEIGHT -412)/ 2 , "assets\\images\\title.png");
-    // Title
+
+    iShowImage((WIDTH - 777) / 2, (HEIGHT - 412) / 2, "assets\\images\\title.png");
+
     iSetColor(255, 255, 255);
-    
+
     iShowText(WIDTH / 2 - 100, HEIGHT - 100, "CROSSY ROAD LITE", "assets/Fonts/Supercell-magic-webfont.ttf");
 
     // Menu items
-    const char *menuItems[] = {"Start New Game", /* "Resume Game", */ "Exit", "Contributors", "Instructions"};
+    const char *menuItems[] = {"Single Player", "Exit", "Contributors", "Instructions", "Dual"};
     int startY = 300; // Position in lower left corner
 
     for (int i = 0; i < MENU_ITEMS; i++)
     {
         if (i == menuSelection)
         {
-            iSetColor(0, 0, 0); // Yellow for selected item
-            iShowText(40, startY - i * 50, "> ","assets/Fonts/Supercell-magic-webfont.ttf");
+            iSetColor(255, 255, 0);
+            iShowText(40, startY - i * 50, "> ", "assets/Fonts/Supercell-magic-webfont.ttf");
         }
         else
         {
             iSetColor(00, 00, 00); // Gray for unselected items
         }
 
-        // Don't show resume if we haven't started a game yet
-        if (i == 1 && currentGameState == MAIN_MENU)
-        {
-            iSetColor(10, 10, 10); // Darker gray for disabled
-        }
-
         iShowText(60, startY - i * 50, menuItems[i], "assets/Fonts/Supercell-magic-webfont.ttf");
     }
 
     // Instructions
-    //iSetColor(150, 150, 150);
-    //iShowText(20, startY - MENU_ITEMS * 50 - 20, "Use UP/DOWN arrows or mouse to navigate","assets/Fonts/Supercell-magic-webfont.ttf");
-    //iShowText(60, startY - MENU_ITEMS * 50 - 40, "Press ENTER to select", "assets/Fonts/Supercell-magic-webfont.ttf");
-    //iShowText(40, startY - MENU_ITEMS * 50 - 60, "Press ESC to pause during game", "assets/Fonts/Supercell-magic-webfont.ttf");
+    // iSetColor(150, 150, 150);
+    // iShowText(20, startY - MENU_ITEMS * 50 - 20, "Use UP/DOWN arrows or mouse to navigate","assets/Fonts/Supercell-magic-webfont.ttf");
+    // iShowText(60, startY - MENU_ITEMS * 50 - 40, "Press ENTER to select", "assets/Fonts/Supercell-magic-webfont.ttf");
+    // iShowText(40, startY - MENU_ITEMS * 50 - 60, "Press ESC to pause during game", "assets/Fonts/Supercell-magic-webfont.ttf");
 }
 
 void drawContributors()
@@ -206,14 +230,14 @@ void drawContributors()
 
     // Title
     iSetColor(255, 255, 255);
-    iShowText(WIDTH / 2 - 100, HEIGHT - 100, "CONTRIBUTORS","assets/Fonts/Supercell-magic-webfont.ttf");
+    iShowText(WIDTH / 2 - 100, HEIGHT - 100, "CONTRIBUTORS", "assets/Fonts/Supercell-magic-webfont.ttf");
 
     // Contributors list
     const char *contributors[] = {
-        
+
         "1. Dipjyoti Das >> ID:2405095 >> CSE-24",
         "2. Md Abdun Noor Nayef Mahdi>>ID:2405091 >> CSE-24",
-    "Supervisor: Anwarul Bashir Shuaib"};
+        "Supervisor: Anwarul Bashir Shuaib"};
     int startY = HEIGHT / 2 + 50;
 
     for (int i = 0; i < 3; i++)
@@ -226,7 +250,7 @@ void drawContributors()
     if (menuSelection == 0)
     {
         iSetColor(255, 255, 0); // Yellow for selected
-        iShowText(WIDTH / 2 - 80, startY - 3 * 50 - 50, "> Back","assets/Fonts/Supercell-magic-webfont.ttf");
+        iShowText(WIDTH / 2 - 80, startY - 3 * 50 - 50, "> Back", "assets/Fonts/Supercell-magic-webfont.ttf");
     }
     else
     {
@@ -245,7 +269,7 @@ void drawInstructions()
 
     // Instructions list
     const char *instructions[] = {
-        "Use UP/DOWN/LEFT/RIGHT arrows to navigate",
+        "Use UP/DOWN/LEFT/RIGHT arrows to navigate"," Player One, W/A/S/D to navigate Player Two",
         "Press ENTER to select",
         "Press ESC to pause during game"};
     int startY = HEIGHT / 2 + 50;
@@ -290,26 +314,23 @@ void drawPauseMenu()
 
 void drawGameOver()
 {
-    // iClear();
-
-    // Display image at the top center
-    // iShowLoadedImage(WIDTH/2 , HEIGHT , &MENU_IMAGE); // Adjust size/position as needed
+    
 
     // Game Over title
     iSetTransparentColor(0, 0, 0, 0.5);
-    iFilledRectangle(WIDTH / 2 - 150-CELL, HEIGHT / 2 - 100-220, 520, 520);
+    iFilledRectangle(WIDTH / 2 - 150 - CELL, HEIGHT / 2 - 100 - 220, 520, 520);
     iSetColor(255, 0, 0);
-    iShowText(WIDTH / 2 - 80-95, HEIGHT - 100-220+CELL, "GAME OVER", "assets/Fonts/Supercell-magic-webfont.ttf",50);
-
+    iShowText(WIDTH / 2 - 80 - 95, HEIGHT - 100 - 220 + CELL, "GAME OVER", "assets/Fonts/Supercell-magic-webfont.ttf", 50);
+    if(!Dual){
     // Display final score and high score
     char scoreText[50];
     iSetColor(255, 255, 255);
 
     sprintf(scoreText, "Final Score: %d", finalScore);
-    iShowText(WIDTH / 2 - 80, HEIGHT - 300-220, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf");
+    iShowText(WIDTH / 2 - 80, HEIGHT - 300 - 220, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf");
 
     sprintf(scoreText, "High Score: %d", highScore);
-    iShowText(WIDTH / 2 - 80, HEIGHT - 350-220, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf");
+    iShowText(WIDTH / 2 - 80, HEIGHT - 350 - 220, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf");
 
     // Collision type
     const char *collisionMessages[] = {
@@ -322,9 +343,19 @@ void drawGameOver()
     if (Collision < 5)
     {
         iSetColor(255, 255, 0);
-        iShowText(WIDTH / 2 - 100, HEIGHT - 220-220, collisionMessages[Collision], "assets/Fonts/Supercell-magic-webfont.ttf");
+        iShowText(WIDTH / 2 - 100, HEIGHT - 220 - 220, collisionMessages[Collision], "assets/Fonts/Supercell-magic-webfont.ttf");
     }
-
+    }
+    else{
+        iSetColor(255, 255, 0);
+        if(currentScore>currentScore2){
+            iShowText(WIDTH / 2 - 140, HEIGHT - 220 - 220, "Player One Wins!", "assets/Fonts/Supercell-magic-webfont.ttf",35);
+        }else if(currentScore<currentScore2){
+            iShowText(WIDTH / 2 - 140, HEIGHT - 220 - 220, "Player Two Wins!", "assets/Fonts/Supercell-magic-webfont.ttf",35);
+        }else{
+            iShowText(WIDTH / 2 - 30, HEIGHT - 220 - 220, "Tie", "assets/Fonts/Supercell-magic-webfont.ttf",45);
+        }
+    }
     // Menu options
     const char *gameOverItems[] = {"Play Again", "Main Menu", "Exit"};
     int startY = HEIGHT / 2 + 50;
@@ -334,18 +365,18 @@ void drawGameOver()
         if (i == menuSelection)
         {
             iSetColor(255, 255, 0);
-            iShowText(WIDTH / 2 - 80, startY - i * 50-220, "> ", "assets/Fonts/Supercell-magic-webfont.ttf");
+            iShowText(WIDTH / 2 - 80, startY - i * 50 - 220, "> ", "assets/Fonts/Supercell-magic-webfont.ttf");
         }
         else
         {
             iSetColor(200, 200, 200);
         }
-        iShowText(WIDTH / 2 - 60, startY - i * 50-220, gameOverItems[i], "assets/Fonts/Supercell-magic-webfont.ttf");
+        iShowText(WIDTH / 2 - 60, startY - i * 50 - 220, gameOverItems[i], "assets/Fonts/Supercell-magic-webfont.ttf");
     }
 
     // Instructions
     iSetColor(150, 150, 150);
-    iShowText(WIDTH / 2 - 120, 100, "Use UP/DOWN arrows to navigate", "assets/Fonts/Supercell-magic-webfont.ttf");
+    iShowText(CELL*5, 100, "Use UP/DOWN arrows or Mouse to navigate", "assets/Fonts/Supercell-magic-webfont.ttf");
     iShowText(WIDTH / 2 - 80, 80, "Press ENTER to select", "assets/Fonts/Supercell-magic-webfont.ttf");
 }
 
@@ -358,13 +389,30 @@ void SplashAnim()
 
     {
 
-        handleGameOver();
+        if (Dual && Collision2 || !Dual && Collision)
+
+            handleGameOver();
         return;
     }
 
     splash.frame_id++;
 }
+void SplashAnim2()
+{
+    if(!Dual ) return;
+    if (Collision2 != Drown || currentGameState == PAUSED)
+        return;
 
+    if (splash2.frame_id == splash2.frames.size())
+
+    {
+        if (Dual && Collision)
+            handleGameOver();
+        return;
+    }
+
+    splash2.frame_id++;
+}
 void Draw::water(int i, bool bg_only = false)
 {
     std::vector<double> x = {(double)0, (double)WIDTH, (double)WIDTH, 0.0};
@@ -513,12 +561,12 @@ void Draw::street(int i, bool bg_only = false)
         {
             if (line[i].dir == 1)
             {
-                if ((int)round(x[0]) + length == -CELL * 3 && currentGameState!=PAUSED)
+                if ((int)round(x[0]) + length == -CELL * 3 && currentGameState != PAUSED)
                     Audio::playAudio(Audio::ALL_CHANNELS, false, MIX_MAX_VOLUME / 2, resources[resource_id].second[line[i].speed_factor < 2 ? 5 : 6].c_str());
             }
             else
             {
-                if ((int)round(x[0]) == WIDTH + CELL * 3  && currentGameState!=PAUSED)
+                if ((int)round(x[0]) == WIDTH + CELL * 3 && currentGameState != PAUSED)
                 {
                     Audio::playAudio(Audio::ALL_CHANNELS, false, MIX_MAX_VOLUME / 2, resources[resource_id].second[line[i].speed_factor < 2 ? 5 : 6].c_str());
                 }
@@ -603,7 +651,7 @@ void Spawn::field(int line_i)
     for (int j = line[line_i].data.size() / 2 - 1; j >= 0; j--)
     {
         line[line_i].data[j] = {pos, (double)pos * CELL, ranint(0, 4)};
-        if (pos == player.x)
+        if (pos == player.x || (Dual && pos==player2.x))
             j++;
         pos -= (ranint(4, 10));
     }
@@ -613,7 +661,7 @@ void Spawn::field(int line_i)
     for (i = line[line_i].data.size() / 2; i < line[line_i].data.size(); i++)
     {
         line[line_i].data[i] = {pos, (double)pos * CELL, ranint(0, 4)};
-        if (pos == player.x)
+        if (pos == player.x || (Dual && pos==player2.x))
             i--;
         pos += ranint(4, 10);
     }
@@ -662,7 +710,7 @@ void Spawn::water(int line_i)
     }
 }
 
-void Horizontal::scrollpx()
+void Horizontal::scrollpx() // not called in Dual
 {
     static int cnt = 0;
     cnt = (cnt + 1) % player_fps;
@@ -687,10 +735,10 @@ void Horizontal::scrollpx()
 
 void motion()
 {
-    
+
     if (keypress.empty())
         return;
-    if (Collision || currentGameState==GameState::MAIN_MENU)
+    if (Collision || currentGameState == GameState::MAIN_MENU)
     {
         keypress.pop();
         return;
@@ -719,7 +767,7 @@ void motion()
             reset();
             return;
         }
-        if (player.x + 1 >= WIDTH / (CELL)-1)
+        if (!Dual && player.x + 1 >= WIDTH / (CELL)-1)
         {
             Horizontal::scrollpx_dir = -1;
             iResumeTimer(Timer::HScrollpx);
@@ -738,7 +786,7 @@ void motion()
             reset();
             return;
         }
-        if (player.x - 1 < 1)
+        if (!Dual && player.x - 1 < 1)
         {
             Horizontal::scrollpx_dir = 1;
             iResumeTimer(Timer::HScrollpx);
@@ -792,15 +840,124 @@ void motion()
     }
     player.frame_no = cnt;
 }
+void motion2()
+{
+
+    if(!Dual) return;
+    if (keypress2.empty())
+        return;
+    if (Collision2 || currentGameState == GameState::MAIN_MENU)
+    {
+        keypress2.pop();
+        return;
+    }
+
+    static int cnt = 0;
+    cnt = (cnt + 1) % player_fps;
+
+    auto reset = [&]()
+    {
+        cnt = 0;
+        isAnim2 = false;
+        keypress2.pop();
+        player2.frame_no = cnt;
+    };
+
+    isAnim = true;
+
+    int currentDirection = keypress2.front();
+
+    if (currentDirection == Right)
+    {
+        player2.motion = Right;
+        if (line[player2.y].type == Field && std::binary_search(line[player2.y].data.begin(), line[player2.y].data.end(), player2.x + 1, less()))
+        {
+            reset();
+            return;
+        }
+        if (!Dual && player2.x + 1 >= WIDTH / (CELL)-1)
+        {
+            Horizontal::scrollpx_dir = -1;
+            iResumeTimer(Timer::HScrollpx);
+            reset();
+            return;
+        }
+        player2.px += 1.0 * CELL / player_fps;
+        if (cnt == 0)
+            player2.x++;
+    }
+    else if (currentDirection == Left)
+    {
+        player2.motion = Left;
+        if (line[player2.y].type == Field && std::binary_search(line[player2.y].data.begin(), line[player2.y].data.end(), player2.x - 1, less()))
+        {
+            reset();
+            return;
+        }
+        if (!Dual && player2.x - 1 < 1)
+        {
+            Horizontal::scrollpx_dir = 1;
+            iResumeTimer(Timer::HScrollpx);
+            reset();
+            return;
+        }
+        player2.px -= 1.0 * CELL / player_fps;
+        if (cnt == 0)
+            player2.x--;
+    }
+    else if (currentDirection == Up)
+    {
+        player2.motion = Up;
+        if (line[player2.y + 1].type == Field && std::binary_search(line[player2.y + 1].data.begin(), line[player2.y + 1].data.end(), player2.x, less()))
+        {
+            reset();
+            return;
+        }
+        player2.py += 1.0 * CELL / player_fps;
+        if (cnt == 0)
+            player2.y++;
+    }
+    else if (currentDirection == Down)
+    {
+        player2.motion = Down;
+        if (line[player2.y - 1].type == Field && std::binary_search(line[player2.y - 1].data.begin(), line[player2.y - 1].data.end(), player2.x, less()))
+        {
+            reset();
+            return;
+        }
+        player2.py -= 1.0 * CELL / player_fps;
+        if (cnt == 0)
+            player2.y--;
+    }
+
+    if (cnt == 0)
+    {
+
+        if (currentDirection == Up)
+        {
+            currentScore2 += 10;
+        }
+        else if (currentDirection == Down)
+        {
+            currentScore2 -= 10;
+        }
+        keypress2.pop();
+        player2.py = player2.y * CELL - 1.0 * (Vertical::V * CELL) / Vertical::scroll_factor;
+        player2.px = player2.x * CELL;
+    }
+    player2.frame_no = cnt;
+}
 
 void stopwatch()
 {
     TIME = (TIME + 1LL) % INT32_MAX;
     Audio::processDeletionQueue();
-    if (!Collision && currentGameState!=MAIN_MENU)
+    if ((!((Dual && Collision && Collision2) || (!Dual && Collision))) && currentGameState != MAIN_MENU)
     {
         Vertical::V = (Vertical::V + 1) % Vertical::scroll_factor;
         player.py -= 1.0 * CELL / Vertical::scroll_factor;
+        if (Dual)
+            player2.py -= 1.0 * CELL / Vertical::scroll_factor;
         if (Vertical::V == 0)
         {
             Vertical::scroll();
@@ -935,6 +1092,132 @@ bool collision(int line_i)
     }
     return false;
 }
+bool collision2(int line_i)
+{
+    if (Collision2 == Drown)
+        return true;
+    if (line[line_i].type == Field)
+        return false;
+    if (line[line_i].dir == 0)
+    {
+        if (std::binary_search(line[line_i].data.begin(), line[line_i].data.end(), player2.x, less()))
+            return false;
+        else
+        {
+            Collision2 = Drown;
+            return true;
+        }
+    }
+    int id;
+    if (line[line_i].dir == 1)
+        id = std::upper_bound(line[line_i].data.begin(), line[line_i].data.end(), player2.x, greater()) - line[line_i].data.begin() - 1;
+    else
+        id = std::upper_bound(line[line_i].data.begin(), line[line_i].data.end(), player2.x, less()) - line[line_i].data.begin() - 1;
+
+    if (id < 0)
+    {
+        if (line[line_i].type == Street)
+        {
+            if (line[line_i].dir == -1 && id < line[line_i].data.size() && player2.x + 1 == line[line_i].data[id + 1].pos)
+            {
+                Collision2 = Vehicle;
+                return true;
+            }
+            else
+                return false;
+        }
+        else
+        {
+            if (line[line_i].dir == -1 && id < line[line_i].data.size() && (player2.px + CELL) - line[line_i].data[id + 1].pospx > 10)
+            {
+                player2.x++;
+                onLog2 = line[line_i].speed_factor * line[line_i].dir;
+                return false;
+            }
+            else
+            {
+                Collision2 = Drown;
+                return true;
+            }
+        }
+    }
+
+    if (line[line_i].type == Street)
+    {
+        if (line[line_i].dir == 1)
+        {
+            if (player2.x >= line[line_i].data[id].pos - line[line_i].data[id].size && player2.x <= line[line_i].data[id].pos)
+            {
+                Collision2 = Vehicle;
+                return true;
+            }
+            else
+                return false;
+        }
+        else
+        {
+            if ((id < line[line_i].data.size() && player2.x + 1 == line[line_i].data[id + 1].pos) || (player2.x < line[line_i].data[id].pos + line[line_i].data[id].size && player2.x >= line[line_i].data[id].pos))
+            {
+                Collision2 = Vehicle;
+                return true;
+            }
+            else
+                return false;
+        }
+    }
+    else if (line[line_i].type == Water)
+    {
+        if (player2.x < 1 || player2.x >= WIDTH / (CELL)-1)
+        {
+            Collision2 = FlownWithLog;
+            return true;
+        }
+        if (line[line_i].dir == 1)
+        {
+            if ((player2.px + CELL) - (line[line_i].data[id].pospx - line[line_i].data[id].size * CELL) > 10 && line[line_i].data[id].pospx - player2.px > 10)
+            {
+                player2.x = std::max((int)player2.x, line[line_i].data[id].pos - line[line_i].data[id].size);
+                player2.x = std::min(line[line_i].data[id].pos - 1, (int)player2.x);
+                onLog2 = line[line_i].speed_factor * line[line_i].dir;
+                return false;
+            }
+            else
+            {
+                Collision2 = Drown;
+                return true;
+            }
+        }
+        else
+        {
+            if ((player2.x <= line[line_i].data[id].pos + line[line_i].data[id].size && player2.x >= line[line_i].data[id].pos))
+            {
+                if (fabs(player2.px - (line[line_i].data[id].pospx + line[line_i].data[id].size * CELL)) < 1e-6)
+                {
+                    player2.x = line[line_i].data[id].pos + line[line_i].data[id].size - 1;
+                }
+                else if (player2.x == line[line_i].data[id].pos + line[line_i].data[id].size)
+                {
+                    Collision2 = Drown;
+                    return true;
+                }
+                onLog2 = line[line_i].speed_factor * line[line_i].dir;
+                return false;
+            }
+            else if (id + 1 < line[line_i].data.size() && (player2.px + CELL) - line[line_i].data[id + 1].pospx > 10)
+            {
+                player2.x++;
+                onLog2 = line[line_i].speed_factor * line[line_i].dir;
+                return false;
+            }
+            else
+            {
+                Collision2 = Drown;
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 void Spawn::all(int line_i, bool isFirstLine = false)
 {
@@ -955,8 +1238,13 @@ void Vertical::scroll()
         line[i] = line[i + 1];
     Spawn::all(line.size() - 1);
     player.y--;
+    if (Dual)
+        player2.y--;
     Vertical::V = 0;
-    Vertical::scroll_factor = 2 * (base_factor) / player.y;
+    if (!Dual && player.y != 0)
+        Vertical::scroll_factor = 2 * (base_factor) / std::max(player.y, 1);
+    else
+        Vertical::scroll_factor = 2 * (base_factor) / std::max({player.y, player2.y,1});
 }
 
 void Horizontal::scroll(int x)
@@ -972,6 +1260,18 @@ void Horizontal::scroll(int x)
                 {
                     player.x += (onLog > 0 ? 1 : -1);
                     player.px = player.x * CELL;
+                }
+            }
+        }
+        if (onLog2)
+        {
+            if (Collision2 != Drown)
+            {
+                player2.px += 1.0 * CELL / onLog2;
+                if (TIME % abs(onLog2) == 0)
+                {
+                    player2.x += (onLog2 > 0 ? 1 : -1);
+                    player2.px = player2.x * CELL;
                 }
             }
         }
@@ -1009,23 +1309,18 @@ void iDraw()
     char scoreText[50];
     iClear();
 
-    
-
     if (currentGameState == CONTRIBUTORS)
     {
         drawContributors();
-        // Draw custom mouse cursor (solid red for menu)
         iSetColor(255, 0, 0);
-        //iFilledCircle(mouseX, mouseY, 5);
         return;
     }
 
     if (currentGameState == INSTRUCTIONS)
     {
         drawInstructions();
-        // Draw custom mouse cursor (solid red for menu)
         iSetColor(255, 0, 0);
-        //iFilledCircle(mouseX, mouseY, 5);
+        
         return;
     }
 
@@ -1033,19 +1328,29 @@ void iDraw()
     {
         player.py = player.y * CELL - 1.0 * (Vertical::V * CELL) / Vertical::scroll_factor;
         player.px = player.x * CELL;
-        std::string collision_msg[] = {"None", "Drown", "FlownWithLog", "Eagle", "Vehicle"};
     }
-
-    if (onLog && (line[player.y].type != Water || line[player.y].dir == 0))
+    if (Dual && Collision2)
+    {
+        player2.py = player2.y * CELL - 1.0 * (Vertical::V * CELL) / Vertical::scroll_factor;
+        player2.px = player2.x * CELL;
+    }
+    if (onLog && (player.y>=0 && line[player.y].type != Water || player.y>=0 && line[player.y].dir == 0))
         onLog = 0;
-
-    if (collision(player.y))
+    if (Dual && onLog2 && (player2.y>=0 && line[player2.y].type != Water || player2.y>=0 && line[player2.y].dir == 0))
+        onLog2 = 0;
+    if (player.y>=0 && collision(player.y))
     {
         if (Collision != FlownWithLog && Collision != Drown)
             player.motion = Dead;
         player.frame_no = 0;
     }
-    if (Collision != Eagle && Collision != Drown)
+    if (player2.y>=0 && collision2(player2.y))
+    {
+        if (Collision2 != FlownWithLog && Collision2 != Drown)
+            player2.motion = Dead;
+        player2.frame_no = 0;
+    }
+    if ((!Dual && Collision != Eagle && Collision != Drown) || Dual && Collision && Collision2 )
     {
         static int countdown = 1e2;
         countdown--;
@@ -1055,12 +1360,16 @@ void iDraw()
             handleGameOver();
         }
     }
-    if (player.y <= 2)
+    if (player.y <= 2 && (!Dual || !Collision))
     {
         Collision = Eagle;
         player.frame_no = 0;
     }
-
+    if (Dual && player2.y <= 2 && !Collision2)
+    {
+        Collision2 = Eagle;
+        player2.frame_no = 0;
+    }
     for (int i = line.size() - 1; i >= 0; i--)
     {
         if (line[i].type == Street)
@@ -1072,9 +1381,15 @@ void iDraw()
             if (splash.frame_id == 0)
                 splash.pos = {player.px - CELL, player.py - SLOPE * player.px};
             iShowLoadedImage(splash.pos.first, splash.pos.second, splash.frames[splash.frame_id]);
-            iShowLoadedImage(player.px, player.py - SLOPE * player.px - CELL/2.75 * splash.frame_id, &player.file[player.motion]);
+            iShowLoadedImage(player.px, player.py - SLOPE * player.px - CELL / 2.75 * splash.frame_id, &player.file[player.motion]);
         }
-
+        if (Dual && i == player2.y && Collision2 == Drown && splash2.frame_id < splash2.frames.size())
+        {
+            if (splash2.frame_id == 0)
+                splash2.pos = {player2.px - CELL, player2.py - SLOPE * player2.px};
+            iShowLoadedImage(splash2.pos.first, splash2.pos.second, splash2.frames[splash2.frame_id]);
+            iShowLoadedImage(player2.px, player2.py - SLOPE * player2.px - CELL / 2.75 * splash2.frame_id, &player2.file[player2.motion]);
+        }
         if (line[i].type == Water)
             Draw::water(i);
 
@@ -1108,53 +1423,85 @@ void iDraw()
             }
             iShowLoadedImage((int)player.px, (int)(player.py - SLOPE * player.px) + (int)(9 * (player.frame_no <= (int)round(player_fps / 2.0) ? player.frame_no : player_fps - player.frame_no)), &player.file[player.motion]);
         }
+        if (Dual && i == player2.y && Collision2 && !deathSound2 && Collision2 != Eagle && Collision2 != FlownWithLog)
+        {
+            Audio::playAudio(2, false, 64, resources[resource_id].second[2].c_str());
+            deathSound2 = 1;
+        }
 
+        if (Dual && i == player2.y && Collision2 == Drown && !drown_sound2)
+        {
+            Audio::playAudio(4, false, MIX_MAX_VOLUME, resources[resource_id].second[8].c_str());
+            drown_sound2 = true;
+        }
+
+        if (Dual && i == player2.y && Collision2 == FlownWithLog && !flown_sound2)
+        {
+            Audio::playAudio(3, false, MIX_MAX_VOLUME, resources[resource_id].second[7].c_str());
+            flown_sound2 = true;
+        }
+
+        if (Dual && i == player2.y && Collision2 != Drown && eagle2.py >= player2.py - CELL)
+        {
+            if (currentGameState == PLAYING && player2.frame_no == 1)
+            {
+                int rnd = ranint(0, 5);
+                Audio::playAudio(2, false, 20, resources[resource_id].second[rnd < 1 ? 0 : 1].c_str());
+            }
+            iShowLoadedImage((int)player2.px, (int)(player2.py - SLOPE * player2.px) + (int)(9 * (player2.frame_no <= (int)round(player_fps / 2.0) ? player2.frame_no : player_fps - player2.frame_no)), &player2.file[player2.motion]);
+        }
         if (line[i].type == Street)
             Draw::street(i);
     }
 
     iShowLoadedImage(eagle.px, eagle.py, &EAGLE);
+    iShowLoadedImage(eagle2.px, eagle2.py, &EAGLE);
 
     if (currentGameState == PLAYING)
     {
-        // Draw score in top-left corner
-        iSetColor(236, 219, 91);
+        
+        if(!Dual){
+        
         sprintf(scoreText, "%d", currentScore);
-        // iSetLineWidth(6);
-        iSetColor(0,0,0);
-        iShowText(CELL, HEIGHT - CELL * 5, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf",45);
+        
+        iSetColor(0, 0, 0);
+        iShowText(CELL, HEIGHT - CELL * 5, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf", 45);
         iSetColor(235, 235, 235);
-        iShowText(CELL, HEIGHT - CELL * 5, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf",40);
+        iShowText(CELL, HEIGHT - CELL * 5, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf", 40);
         iSetColor(185, 171, 71);
         sprintf(scoreText, "High Score: %d", highScore);
         iShowText(CELL, HEIGHT - CELL * 6, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf");
-        // Draw custom mouse cursor (semi-transparent to indicate no interaction)
-        iSetColor(255, 0, 0); // RGBA with alpha for transparency
-        //iFilledCircle(mouseX, mouseY, 5);
+        }else{
+            sprintf(scoreText, "%d", currentScore2);
+        
+            iSetColor(0, 0, 0);
+            iShowText(CELL, HEIGHT - CELL * 5, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf", 45);
+            iSetColor(235, 235, 235);
+            iShowText(CELL, HEIGHT - CELL * 5, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf", 40);
+            sprintf(scoreText, "%d", currentScore);
+        
+            iSetColor(0, 0, 0);
+            iShowText(WIDTH-CELL*4, HEIGHT - CELL * 5, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf", 45);
+            iSetColor(235, 235, 235);
+            iShowText(WIDTH-CELL*4, HEIGHT - CELL * 5, scoreText, "assets/Fonts/Supercell-magic-webfont.ttf", 40);
+        }
     }
     if (currentGameState == PAUSED)
     {
         drawPauseMenu();
-        // Draw custom mouse cursor (solid red, though no mouse interaction)
-        iSetColor(255, 0, 0);
-        //iFilledCircle(mouseX, mouseY, 5);
-        // return;
     }
     if (currentGameState == GAME_OVER)
     {
         drawGameOver();
-        // Draw custom mouse cursor (solid red for menu)
-        iSetColor(255, 0, 0);
-        //iFilledCircle(mouseX, mouseY, 5);
-        // return;
     }
     if (currentGameState == MAIN_MENU)
     {
         drawMainMenu();
-        // Draw custom mouse cursor (solid red for menu)
-        iSetColor(255, 0, 0);
-        //iFilledCircle(mouseX, mouseY, 5);
-        return;
+    }
+    if(Dual){
+    iSetLineWidth(4);
+    iSetTransparentColor(255,255,255,0.5);
+    iLine(WIDTH/2,0,WIDTH/2,HEIGHT);
     }
 }
 
@@ -1174,22 +1521,18 @@ void iMouse(int button, int state, int mx, int my)
             int startY = 300;
             for (int i = 0; i < MENU_ITEMS; i++)
             {
-                if (isMouseOverMenuItem(mx, my, i, startY, 50, 40,240))
+                if (isMouseOverMenuItem(mx, my, i, startY, 50, 40, 240))
                 {
-                    // Audio::playAudio(Audio::ALL_CHANNELS,false,MIX_MAX_VOLUME,resources[resource_id].second[9].c_str());
+                    
                     menuSelection = i;
                     switch (menuSelection)
                     {
                     case 0: // Start New Game
-                    currentGameState=PLAYING;
-                        //startNewGame();
+                        Dual = false;
+                        currentGameState = PLAYING;
+                        // startNewGame();
                         break;
-                    /* case 1: // Resume Game
-                        if (currentGameState != MAIN_MENU)
-                        {
-                            resumeGame();
-                        }
-                        break; */
+
                     case 1: // Exit
                         Audio::pauseAudio(Audio::ALL_CHANNELS);
                         Audio::cleanAudio();
@@ -1198,6 +1541,7 @@ void iMouse(int button, int state, int mx, int my)
                         exit(0);
                         break;
                     case 2: // Contributors
+
                         currentGameState = CONTRIBUTORS;
                         menuSelection = 0; // Reset for "Back" option
                         break;
@@ -1205,27 +1549,33 @@ void iMouse(int button, int state, int mx, int my)
                         currentGameState = INSTRUCTIONS;
                         menuSelection = 0; // Reset for "Back" option
                         break;
+                    case 4: // Dual
+                        Dual = true;
+                        currentGameState = PLAYING;
+                        startNewGame();
                     }
-                    // Audio::playAudio(1, false, MIX_MAX_VOLUME/2, resources[resource_id].second[0].c_str());
+                    
                     break;
                 }
             }
         }
         else if (currentGameState == GAME_OVER)
         {
-            int startY = HEIGHT / 2 + 50-220;
+            int startY = HEIGHT / 2 + 50 - 220;
             for (int i = 0; i < 3; i++)
             {
                 if (isMouseOverMenuItem(mx, my, i, startY, 50, WIDTH / 2 - 60, WIDTH / 2 + 120))
                 {
-                    // Audio::playAudio(Audio::ALL_CHANNELS,false,MIX_MAX_VOLUME,resources[resource_id].second[9].c_str());
+                    
                     menuSelection = i;
                     switch (menuSelection)
                     {
                     case 0: // Play Again
+                        
                         startNewGame();
                         break;
                     case 1: // Main Menu
+                    Dual=false;
                         startNewGame();
                         currentGameState = MAIN_MENU;
                         menuSelection = 0;
@@ -1236,7 +1586,7 @@ void iMouse(int button, int state, int mx, int my)
                         iCloseWindow();
                         break;
                     }
-                    // Audio::playAudio(1, false, MIX_MAX_VOLUME/2, resources[resource_id].second[0].c_str());
+                    
                     break;
                 }
             }
@@ -1250,7 +1600,7 @@ void iMouse(int button, int state, int mx, int my)
                 startNewGame();
                 currentGameState = MAIN_MENU;
                 menuSelection = 0; // Reset to first menu item
-                                   // Audio::playAudio(1, false, MIX_MAX_VOLUME/2, resources[resource_id].second[9].c_str());
+                                   
             }
         }
         else if (currentGameState == INSTRUCTIONS)
@@ -1262,7 +1612,7 @@ void iMouse(int button, int state, int mx, int my)
                 startNewGame();
                 currentGameState = MAIN_MENU;
                 menuSelection = 0; // Reset to first menu item
-                                   // Audio::playAudio(1, false, MIX_MAX_VOLUME/2, resources[resource_id].second[9].c_str());
+                                  
             }
         }
         // Explicitly ignore mouse clicks during PLAYING and PAUSED states
@@ -1285,7 +1635,7 @@ void iMouseMove(int mx, int my)
                 if (menuSelection != i)
                 {
                     menuSelection = i;
-                    // Audio::playAudio(1, false, MIX_MAX_VOLUME/2, resources[resource_id].second[9].c_str());
+                    
                 }
                 found = true;
                 break;
@@ -1298,7 +1648,7 @@ void iMouseMove(int mx, int my)
     }
     else if (currentGameState == GAME_OVER)
     {
-        int startY = HEIGHT / 2 + 50-220;
+        int startY = HEIGHT / 2 + 50 - 220;
         bool found = false;
         for (int i = 0; i < 3; i++)
         {
@@ -1307,7 +1657,7 @@ void iMouseMove(int mx, int my)
                 if (menuSelection != i)
                 {
                     menuSelection = i;
-                    // Audio::playAudio(1, false, MIX_MAX_VOLUME/2, resources[resource_id].second[9].c_str());
+                    
                 }
                 found = true;
                 break;
@@ -1326,7 +1676,7 @@ void iMouseMove(int mx, int my)
             if (menuSelection != 0)
             {
                 menuSelection = 0;
-                // Audio::playAudio(1, false, MIX_MAX_VOLUME/2, resources[resource_id].second[9].c_str());
+                
             }
         }
         else if (menuSelection != -1)
@@ -1342,7 +1692,7 @@ void iMouseMove(int mx, int my)
             if (menuSelection != 0)
             {
                 menuSelection = 0;
-                // Audio::playAudio(1, false, MIX_MAX_VOLUME/2, resources[resource_id].second[9].c_str());
+               
             }
         }
         else if (menuSelection != -1)
@@ -1370,25 +1720,31 @@ void iKeyboard(unsigned char key, int state)
 {
     if (state != GLUT_DOWN)
         return;
-
+    if (Dual)
+    {
+        if (key == 'w' || key == 'W')
+            keypress2.push(Up);
+        else if (key == 's' || key == 'S')
+            keypress2.push(Down);
+        else if (key == 'd' || key == 'D')
+            keypress2.push(Right);
+        else if (key == 'a' || key == 'A')
+            keypress2.push(Left);
+    }
     if (key == 13)
     { // Enter key
         Audio::playAudio(Audio::ALL_CHANNELS, false, MIX_MAX_VOLUME, resources[resource_id].second[9].c_str());
         if (currentGameState == MAIN_MENU)
         {
-            // Audio::playAudio(Audio::ALL_CHANNELS,false,MIX_MAX_VOLUME,resources[resource_id].second[9].c_str());
+            
             switch (menuSelection)
             {
             case 0: // Start New Game
-                //startNewGame();
-                currentGameState=PLAYING;
+                // startNewGame();
+                Dual = false;
+                currentGameState = PLAYING;
                 break;
-            /* case 1: // Resume Game
-                if (currentGameState != MAIN_MENU)
-                {
-                    resumeGame();
-                }
-                break; */
+
             case 1: // Exit
                 Audio::pauseAudio(Audio::ALL_CHANNELS);
                 Audio::cleanAudio();
@@ -1404,18 +1760,22 @@ void iKeyboard(unsigned char key, int state)
                 currentGameState = INSTRUCTIONS;
                 menuSelection = 0; // Reset for "Back" option
                 break;
+            case 4:
+                currentGameState = PLAYING;
+                Dual = true;
+                break;
             }
         }
         else if (currentGameState == GAME_OVER)
         {
-            // Audio::playAudio(Audio::ALL_CHANNELS,false,MIX_MAX_VOLUME,resources[resource_id].second[9].c_str());
+           
             switch (menuSelection)
             {
             case 0: // Play Again
                 startNewGame();
                 break;
             case 1: // Main Menu
-            startNewGame();
+                startNewGame();
                 currentGameState = MAIN_MENU;
                 break;
             case 2: // Exit
@@ -1453,12 +1813,12 @@ void iSpecialKeyboard(unsigned char key, int state)
         if (key == GLUT_KEY_UP)
         {
             menuSelection = (menuSelection - 1 + MENU_ITEMS) % MENU_ITEMS;
-            // Audio::playAudio(1, false, MIX_MAX_VOLUME/2, resources[resource_id].second[0].c_str());
+            
         }
         if (key == GLUT_KEY_DOWN)
         {
             menuSelection = (menuSelection + 1) % MENU_ITEMS;
-            // Audio::playAudio(1, false, MIX_MAX_VOLUME/2, resources[resource_id].second[0].c_str());
+            
         }
         return;
     }
@@ -1489,7 +1849,8 @@ void EagleSpawn()
 
     if (eagle.py < -HEIGHT)
     {
-        handleGameOver();
+        if (Collision2)
+            handleGameOver();
         iPauseTimer(Timer::Eagle);
         return;
     }
@@ -1508,6 +1869,39 @@ void EagleSpawn()
         {
             Audio::playAudio(2, false, 64, resources[resource_id].second[2].c_str());
             deathSound = 1;
+        }
+    }
+}
+void EagleSpawn2()
+{
+
+    if (!Dual)
+        return;
+    if (Collision2 != Eagle)
+        return;
+
+    if (eagle2.py < -HEIGHT)
+    {
+        if (Collision2)
+            handleGameOver();
+        iPauseTimer(Timer::Eagle2);
+        return;
+    }
+
+    eagle2.px = (20.0 / CELL) * (eagle2.py - player2.py) + player2.px - CELL;
+    eagle2.py -= 1.0 * HEIGHT / eagle2.fps;
+
+    if (fabs(eagle2.py - (HEIGHT - CELL)) < CELL && !eagle_sound2)
+    {
+        Audio::playAudio(Audio::ALL_CHANNELS, false, MIX_MAX_VOLUME, resources[resource_id].second[4].c_str());
+        eagle_sound2 = true;
+    }
+    if (fabs(eagle2.py - player2.py) < CELL)
+    {
+        if (!deathSound2)
+        {
+            Audio::playAudio(2, false, 64, resources[resource_id].second[2].c_str());
+            deathSound2 = 1;
         }
     }
 }
@@ -1541,19 +1935,21 @@ int main(int argc, char *argv[])
         Spawn::all(i, (i <= start_y + 3 ? true : false));
     }
     Timer::Eagle = iSetTimer(1.0 * eagle.speed_ms / eagle.fps, EagleSpawn);
+    Timer::Eagle2 = iSetTimer(1.0 * eagle2.speed_ms / eagle2.fps, EagleSpawn2);
     player.motion = Up;
 
-     Audio::playAudio(Audio::MUSIC_CHANNEL, true, MIX_MAX_VOLUME, resources[resource_id].second[3].c_str());
+    Audio::playAudio(Audio::MUSIC_CHANNEL, true, MIX_MAX_VOLUME, resources[resource_id].second[3].c_str());
 
     Timer::stopwatch = iSetTimer(1000 / FPS, stopwatch);
     Timer::HScrollpx = iSetTimer(std::max(1.0, PLAYER_SPEED / 10.0), Horizontal::scrollpx);
 
     iPauseTimer(Timer::HScrollpx);
     iSetTimer(round(700.0 / splash.frames.size()), SplashAnim);
+    iSetTimer(round(700.0 / splash.frames.size()), SplashAnim2);
     Timer::player = iSetTimer(PLAYER_SPEED / (player_fps), motion);
-    
+    Timer::player2 = iSetTimer(PLAYER_SPEED / (player_fps), motion2);
+    iPauseTimer(Timer::player2);
     currentGameState = MAIN_MENU;
     iOpenWindow(WIDTH, HEIGHT, "Crossy Road Lite");
     return 0;
 }
-

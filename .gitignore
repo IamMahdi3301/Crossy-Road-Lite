@@ -1,2 +1,3 @@
 bin/opengl.exe
+obj/opengl.o
 .vscode/
