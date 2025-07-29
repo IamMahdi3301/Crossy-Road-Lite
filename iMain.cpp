@@ -1589,11 +1589,14 @@ void iMouse(int button, int state, int mx, int my)
 
                     case 1: // Exit
                         // Audio::pauseAudio(Audio::ALL_CHANNELS);
-
+                        Audio::pauseAudio(Audio::ALL_CHANNELS);
                         Audio::cleanAudio();
-                        // iCloseWindow();
+
                         system("attrib +h +r saves/highestscore");
-                        exit(0);
+                        //exit(0);
+                        
+                        iCloseWindow();
+
                         break;
                     case 2: // Contributors
 
@@ -1653,7 +1656,8 @@ void iMouse(int button, int state, int mx, int my)
                         Audio::pauseAudio(Audio::ALL_CHANNELS);
                         Audio::cleanAudio();
                         system("attrib +h +r saves/highestscore");
-                        exit(0);
+                        //exit(0);
+                        iCloseWindow();
                         break;
                     }
 
@@ -1813,8 +1817,8 @@ void iKeyboard(unsigned char key, int state)
                 Audio::pauseAudio(Audio::ALL_CHANNELS);
                 Audio::cleanAudio();
                 system("attrib +h +r saves/highestscore");
-                exit(0);
-                // iCloseWindow();its getting (exit code: -1073741819)
+                //exit(0);
+                 iCloseWindow();//its getting (exit code: -1073741819)
                 break;
             case 2: // Contributors
                 currentGameState = CONTRIBUTORS;
@@ -1861,7 +1865,8 @@ void iKeyboard(unsigned char key, int state)
                 Audio::pauseAudio(Audio::ALL_CHANNELS);
                 Audio::cleanAudio();
                 system("attrib +h +r saves/highestscore");
-                exit(0);
+                //exit(0);
+                iCloseWindow();
                 break;
             }
         }
