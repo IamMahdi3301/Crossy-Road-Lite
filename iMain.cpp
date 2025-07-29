@@ -14,13 +14,15 @@ enum GameState
     GAME_OVER,
     CONTRIBUTORS,
     INSTRUCTIONS,
+    SETTINGS,
 
 };
+
 bool Dual = false;
 GameState currentGameState = MAIN_MENU;
 
 int menuSelection = 0;
-const int MENU_ITEMS = 5;
+const int MENU_ITEMS = 6;
 
 bool gameOverSoundPlayed = false;
 int finalScore = 0;
@@ -30,6 +32,11 @@ int currentScore2 = 0;
 long long highScore = 0;
 
 int mouseX = 0, mouseY = 0;
+
+int gameVolume = 100;   // Overall game volume (0-100)
+int trainVolume = 100;  // Train sound volume (0-100)
+int eagleVolume = 100;  // Eagle sound volume (0-100)
+int settingsSelection = -1; // For settings menu navigation
 
 void resetGame()
 {
@@ -192,20 +199,25 @@ void handleGameOver()
 
 void drawMainMenu()
 {
-
     iShowImage((WIDTH - 777) / 2, (HEIGHT - 412) / 2, "assets\\images\\title.png");
 
     iSetColor(255, 255, 255);
-
     iShowText(WIDTH / 2 - 100, HEIGHT - 100, "CROSSY ROAD LITE", "assets/Fonts/Supercell-magic-webfont.ttf");
 
     // Menu items
-    const char *menuItems[] = {"Single Player", "Exit", "Contributors", "Instructions", "Dual"};
-    int startY = 300; // Position in lower left corner
+    const char *menuItems[] = {
+        "Single Player",
+        "Dual",
+        "Settings",
+        "Contributors",
+        "Instructions",
+        "Exit"
+    };
+
+    int startY = 400; // Increased from 300 to shift menu upward
 
     const int basefontsize = 20;
     const int enlargedfontsize = 27;
- 
 
     for (int i = 0; i < MENU_ITEMS; i++)
     {
@@ -214,22 +226,57 @@ void drawMainMenu()
         if (i == menuSelection)
         {
             iSetColor(255, 255, 0);
-            iShowText(40, startY - i * 50, "> ", "assets/Fonts/Supercell-magic-webfont.ttf",fontSize);
+            iShowText(40, startY - i * 50, "> ", "assets/Fonts/Supercell-magic-webfont.ttf", fontSize);
         }
         else
         {
-            iSetColor(00, 00, 00); // Gray for unselected items
+            iSetColor(0, 0, 0); // Gray for unselected items
         }
 
-        iShowText(60, startY - i * 50, menuItems[i], "assets/Fonts/Supercell-magic-webfont.ttf",fontSize);
+        iShowText(60, startY - i * 50, menuItems[i], "assets/Fonts/Supercell-magic-webfont.ttf", fontSize);
     }
-
-    // Instructions
-    // iSetColor(150, 150, 150);
-    // iShowText(20, startY - MENU_ITEMS * 50 - 20, "Use UP/DOWN arrows or mouse to navigate","assets/Fonts/Supercell-magic-webfont.ttf");
-    // iShowText(60, startY - MENU_ITEMS * 50 - 40, "Press ENTER to select", "assets/Fonts/Supercell-magic-webfont.ttf");
-    // iShowText(40, startY - MENU_ITEMS * 50 - 60, "Press ESC to pause during game", "assets/Fonts/Supercell-magic-webfont.ttf");
 }
+
+
+
+
+void drawSettings()
+{
+    iClear();
+    iShowImage(0, 0, "assets\\images\\solid-color-image.png"); // Use a background image
+    iSetColor(255, 255, 255);
+    iShowText(WIDTH / 2 - 80, HEIGHT - 100, "SETTINGS", "assets/Fonts/Supercell-magic-webfont.ttf");
+    const char *settingsItems[] = {"Game Volume", "Train Volume", "Eagle Volume", "Back"};
+    int startY = HEIGHT / 2 + 50;
+    const int basefontsize = 20;
+    const int enlargedfontsize = 27;
+    for (int i = 0; i < 4; i++)
+    {
+        int fontSize = (i == settingsSelection) ? enlargedfontsize : basefontsize;
+        if (i == settingsSelection)
+        {
+            iSetColor(255, 255, 0);
+            iShowText(WIDTH / 2 - 80, startY - i * 50, "> ", "assets/Fonts/Supercell-magic-webfont.ttf", fontSize);
+        }
+        else
+        {
+            iSetColor(0, 0, 0);
+        }
+        iShowText(WIDTH / 2 - 60, startY - i * 50, settingsItems[i], "assets/Fonts/Supercell-magic-webfont.ttf", fontSize);
+        if (i < 3)
+        {
+            char volumeText[20];
+            int volume = (i == 0) ? gameVolume : (i == 1) ? trainVolume : eagleVolume;
+            sprintf(volumeText, "                  %d%%", volume);
+            iSetColor(0, 0, 0);
+            iShowText(WIDTH / 2 + 100, startY - i * 50, volumeText, "assets/Fonts/Supercell-magic-webfont.ttf", basefontsize);
+        }
+    }
+}
+
+
+
+
 
 void drawContributors()
 {
@@ -1347,6 +1394,13 @@ void iDraw()
         return;
     }
 
+    if (currentGameState == SETTINGS)
+{
+    drawSettings();
+    iSetColor(255, 0, 0);
+    return;
+}
+
     if (Collision)
     {
         player.py = player.y * CELL - 1.0 * (Vertical::V * CELL) / Vertical::scroll_factor;
@@ -1539,51 +1593,52 @@ bool isMouseOverMenuItem(int mx, int my, int itemIndex, int startY, int itemHeig
     return (mx >= xMin && mx <= xMax && my >= yPos - itemHeight / 2 && my <= yPos + itemHeight / 2);
 }
 
+
+
 void iMouse(int button, int state, int mx, int my)
 {
     if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
     {
-        Audio::playAudio(Audio::ALL_CHANNELS, false, MIX_MAX_VOLUME, resources[resource_id].second[9].c_str());
+        Audio::playAudio(Audio::ALL_CHANNELS, false, (gameVolume * MIX_MAX_VOLUME) / 100, resources[resource_id].second[9].c_str());
         if (currentGameState == MAIN_MENU)
         {
-            int startY = 300;
+            int startY = 400; // Updated to match drawMainMenu
             for (int i = 0; i < MENU_ITEMS; i++)
             {
                 if (isMouseOverMenuItem(mx, my, i, startY, 50, 40, 240))
                 {
-
                     menuSelection = i;
                     switch (menuSelection)
                     {
-                    case 0: // Start New Game
+                    case 0: // Single Player
                         Dual = false;
                         currentGameState = PLAYING;
-                        // startNewGame();
+                        startNewGame();
                         break;
-
-                    case 1: // Exit
-                        Audio::pauseAudio(Audio::ALL_CHANNELS);
-                        Audio::cleanAudio();
-                        // iCloseWindow();
-                        system("attrib +h +r saves/highestscore");
-                        exit(0);
-                        break;
-                    case 2: // Contributors
-
-                        currentGameState = CONTRIBUTORS;
-                        menuSelection = 0; // Reset for "Back" option
-                        break;
-                    case 3: // Instructions
-                        currentGameState = INSTRUCTIONS;
-                        menuSelection = 0; // Reset for "Back" option
-                        break;
-                    case 4: // Dual
+                    case 1: // Dual
                         Dual = true;
                         currentGameState = PLAYING;
                         startNewGame();
                         break;
+                    case 2: // Settings
+                        currentGameState = SETTINGS;
+                        settingsSelection = 0;
+                        break;
+                    case 3: // Contributors
+                        currentGameState = CONTRIBUTORS;
+                        menuSelection = 0; // Reset for "Back" option
+                        break;
+                    case 4: // Instructions
+                        currentGameState = INSTRUCTIONS;
+                        menuSelection = 0; // Reset for "Back" option
+                        break;
+                    case 5: // Exit
+                        Audio::pauseAudio(Audio::ALL_CHANNELS);
+                        Audio::cleanAudio();
+                        system("attrib +h +r saves/highestscore");
+                        iCloseWindow(); // Replaced exit(0) to avoid crash
+                        break;
                     }
-
                     break;
                 }
             }
@@ -1595,12 +1650,10 @@ void iMouse(int button, int state, int mx, int my)
             {
                 if (isMouseOverMenuItem(mx, my, i, startY, 50, WIDTH / 2 - 60, WIDTH / 2 + 120))
                 {
-
                     menuSelection = i;
                     switch (menuSelection)
                     {
                     case 0: // Play Again
-
                         startNewGame();
                         break;
                     case 1: // Main Menu
@@ -1615,7 +1668,6 @@ void iMouse(int button, int state, int mx, int my)
                         iCloseWindow();
                         break;
                     }
-
                     break;
                 }
             }
@@ -1626,7 +1678,6 @@ void iMouse(int button, int state, int mx, int my)
             if (isMouseOverMenuItem(mx, my, 0, startY, 50, WIDTH / 2 - 80, WIDTH / 2 + 120))
             {
                 menuSelection = 0; // Back
-                startNewGame();
                 currentGameState = MAIN_MENU;
                 menuSelection = 0; // Reset to first menu item
             }
@@ -1637,14 +1688,32 @@ void iMouse(int button, int state, int mx, int my)
             if (isMouseOverMenuItem(mx, my, 0, startY, 50, WIDTH / 2 - 80, WIDTH / 2 + 120))
             {
                 menuSelection = 0; // Back
-                startNewGame();
                 currentGameState = MAIN_MENU;
                 menuSelection = 0; // Reset to first menu item
             }
         }
-        // Explicitly ignore mouse clicks during PLAYING and PAUSED states
+        else if (currentGameState == SETTINGS)
+        {
+            int startY = HEIGHT / 2 + 50;
+            for (int i = 0; i < 4; i++)
+            {
+                if (isMouseOverMenuItem(mx, my, i, startY, 50, WIDTH / 2 - 60, WIDTH / 2 + 120))
+                {
+                    settingsSelection = i;
+                    if (i == 3) // Back
+                    {
+                        currentGameState = MAIN_MENU;
+                        menuSelection = 0;
+                        settingsSelection = -1;
+                    }
+                    break;
+                }
+            }
+        }
     }
 }
+
+
 
 void iMouseMove(int mx, int my)
 {
@@ -1653,7 +1722,7 @@ void iMouseMove(int mx, int my)
 
     if (currentGameState == MAIN_MENU)
     {
-        int startY = 300;
+        int startY = 400; // Updated to match drawMainMenu
         bool found = false;
         for (int i = 0; i < MENU_ITEMS; i++)
         {
@@ -1723,7 +1792,6 @@ void iMouseMove(int mx, int my)
             menuSelection = -1; // No selection
         }
     }
-    // No menu selection updates in PLAYING or PAUSED states
 }
 
 void iMouseDrag(int mx, int my)
@@ -1819,6 +1887,44 @@ void iKeyboard(unsigned char key, int state)
                 menuSelection = 0; // Reset to first menu item
             }
         }
+
+
+
+        else if (currentGameState == SETTINGS)
+{
+    if (key == GLUT_KEY_UP)
+    {
+        settingsSelection = (settingsSelection - 1 + 4) % 4;
+    }
+    else if (key == GLUT_KEY_DOWN)
+    {
+        settingsSelection = (settingsSelection + 1) % 4;
+    }
+    else if (key == GLUT_KEY_LEFT && settingsSelection < 3)
+    {
+        if (settingsSelection == 0)
+            gameVolume = std::max(0, gameVolume - 10);
+        else if (settingsSelection == 1)
+            trainVolume = std::max(0, trainVolume - 10);
+        else if (settingsSelection == 2)
+            eagleVolume = std::max(0, eagleVolume - 10);
+    }
+    else if (key == GLUT_KEY_RIGHT && settingsSelection < 3)
+    {
+        if (settingsSelection == 0)
+            gameVolume = std::min(100, gameVolume + 10);
+        else if (settingsSelection == 1)
+            trainVolume = std::min(100, trainVolume + 10);
+        else if (settingsSelection == 2)
+            eagleVolume = std::min(100, eagleVolume + 10);
+    }
+    else if (key == '\r' && settingsSelection == 3) // Enter key for Back
+    {
+        currentGameState = MAIN_MENU;
+        menuSelection = 0;
+        settingsSelection = -1;
+    }
+}
     }
     else if (key == 27)
     { // ESC key
@@ -1976,3 +2082,4 @@ int main(int argc, char *argv[])
     iOpenWindow(WIDTH, HEIGHT, "Crossy Road Lite");
     return 0;
 }
+
