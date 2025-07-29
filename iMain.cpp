@@ -1,6 +1,7 @@
 #include "headers_and_declarations.cpp"
 /*
 got exit code -1073740771. Check code. Happens when transiting from game over
+Memory leak in audio?
 */
 enum GameState
 {
@@ -225,7 +226,7 @@ void drawContributors()
 {
     // iClear();
     iSetTransparentColor(0, 0, 0, 0.5);
-    iFilledRectangle(0, 0, WIDTH, HEIGHT);
+    iFilledRectangle(0, 0, WIDTH+CELL, HEIGHT);
     // Title
     iSetColor(255, 255, 255);
     iShowText(350, 700, "===CREDITS===", "assets\\Fonts\\SacrificeDemo-8Ox1B.ttf", 40);
@@ -272,7 +273,7 @@ void drawInstructions()
 {
     // iClear();
     iSetTransparentColor(0, 0, 0, 0.5);
-    iFilledRectangle(0, 0, WIDTH, HEIGHT);
+    iFilledRectangle(0, 0, WIDTH+CELL, HEIGHT);
     // Title
     iSetColor(255, 255, 255);
     iShowText(375, 650, "==Controls==", "assets\\Fonts\\SacrificeDemo-8Ox1B.ttf", 40);
@@ -697,7 +698,7 @@ void Spawn::water(int line_i)
     int dir = line[line_i].dir = (ranint(0, 2) == 0 ? 1 : -1);
 
     if (line_i > 0 && line[line_i - 1].type == Water && line[line_i - 1].dir == dir)
-        line[line_i].speed_factor = std::max(std::max(2.0, (ranint(5, 9)) * FPS / 20.0), (FPS / 20.0) * (line[line_i].speed_factor - 1 - ranint(0, 3)));
+        line[line_i].speed_factor = std::min(std::max(2.0, (ranint(5, 9)) * FPS / 20.0), (FPS / 20.0) * (line[line_i].speed_factor - 1 - ranint(0, 3)));
     else
         line[line_i].speed_factor = std::max(2.0, (ranint(5, 9)) * FPS / 20.0);
 
@@ -1549,7 +1550,7 @@ void iDraw()
         iSetTransparentColor(255, 255, 255, 0.5);
         iLine(WIDTH / 2, 0, WIDTH / 2, HEIGHT);
     }
-    drawCoordinateAxes(CELL);
+    //drawCoordinateAxes(CELL);
 }
 
 bool isMouseOverMenuItem(int mx, int my, int itemIndex, int startY, int itemHeight = 50, int xMin = 40, int xMax = 240)
@@ -1967,7 +1968,7 @@ int main(int argc, char *argv[])
     if (hfp)
     {
         fscanf(hfp, "%lld", &highScore);
-        system("attrib  +h saves/highestscore");
+        system("attrib  -h -r saves/highestscore");
         fclose(hfp);
     }
     load_resources();
@@ -1999,6 +2000,6 @@ int main(int argc, char *argv[])
     Timer::player2 = iSetTimer(PLAYER_SPEED / (player_fps), motion2);
     iPauseTimer(Timer::player2);
     currentGameState = MAIN_MENU;
-    iOpenWindow(WIDTH, HEIGHT, "Crossy Road Lite");
+    iOpenWindow(WIDTH-25, HEIGHT, "Crossy Road Lite");
     return 0;
 }

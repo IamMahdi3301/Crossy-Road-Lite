@@ -452,6 +452,12 @@ void load_resources()
                          {"assets\\sounds\\cluck0.wav", "assets\\sounds\\cluck1.wav", "assets\\sounds\\death.wav",
                           "assets\\sounds\\traffic.ogg", "assets\\sounds\\eagle.wav", "assets\\sounds\\train.wav", "assets\\sounds\\train05x.wav", "assets\\sounds\\flown.wav", "assets\\sounds\\drown.wav", "assets\\sounds\\click.wav",
                         "assets/sounds/quack.wav"}});
+    resources.push_back({{"assets\\images\\truck1.png", "assets\\images\\truck2.png", "assets\\images\\car1.png", "assets\\images\\car2.png",
+                          "assets/images/rock.png", "assets/images/up3.png", "assets/images/down3.png", "assets/images/left3.png", "assets/images/right3.png", "assets/images/Dead3.png", "assets/images/train(main).png", "assets/images/eagle.png", "assets/images/lilypad.png", "assets\\images\\tree21.png", "assets\\images\\tree22.png", "assets\\images\\tree23.png", "assets\\images\\tree24.png","assets/images/up2.png", "assets/images/down2.png", "assets/images/left2.png", "assets/images/right2.png", "assets/images/dead2.png"},
+                         {"assets\\sounds\\cluck0.wav", "assets\\sounds\\cluck1.wav", "assets\\sounds\\death.wav",
+                          "assets\\sounds\\traffic.ogg", "assets\\sounds\\eagle.wav", "assets\\sounds\\train.wav", "assets\\sounds\\train05x.wav", "assets\\sounds\\flown.wav", "assets\\sounds\\drown.wav", "assets\\sounds\\click.wav",
+                        "assets/sounds/quack.wav"}});
+                        
 }
 std::vector<Image *> Images = {
     &TRUCK1, &TRUCK2, &CAR1, &CAR2, &ROCK, &player.file[Up], &player.file[Down], &player.file[Left], &player.file[Right], &player.file[Dead], &TRAIN, &EAGLE, &LILYPAD, &TREE[0], &TREE[1], &TREE[2], &TREE[3], 
