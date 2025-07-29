@@ -2082,4 +2082,3 @@ int main(int argc, char *argv[])
     iOpenWindow(WIDTH, HEIGHT, "Crossy Road Lite");
     return 0;
 }
-
