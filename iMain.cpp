@@ -132,6 +132,12 @@ void resumeGame()
 void startNewGame()
 {
     resetGame();
+
+    /* if(Duel) resource_id=0;
+    else resource_id=ranint(0,resources.size()-1);
+
+    Load_Image(); */
+
     currentGameState = PLAYING;
 
     // Start all timers
@@ -144,8 +150,8 @@ void startNewGame()
         iResumeTimer(Timer::Eagle2);
     }
     // Start background music
-    if(!Mix_PlayingMusic())
-    Audio::playAudio(Audio::MUSIC_CHANNEL, true, MIX_MAX_VOLUME, resources[resource_id].second[3].c_str());
+    if (!Mix_PlayingMusic())
+        Audio::playAudio(Audio::MUSIC_CHANNEL, true, MIX_MAX_VOLUME, resources[resource_id].second[3].c_str());
 }
 
 void handleGameOver()
@@ -226,7 +232,7 @@ void drawContributors()
 {
     // iClear();
     iSetTransparentColor(0, 0, 0, 0.5);
-    iFilledRectangle(0, 0, WIDTH+CELL, HEIGHT);
+    iFilledRectangle(0, 0, WIDTH + CELL, HEIGHT);
     // Title
     iSetColor(255, 255, 255);
     iShowText(350, 700, "===CREDITS===", "assets\\Fonts\\SacrificeDemo-8Ox1B.ttf", 40);
@@ -273,7 +279,7 @@ void drawInstructions()
 {
     // iClear();
     iSetTransparentColor(0, 0, 0, 0.5);
-    iFilledRectangle(0, 0, WIDTH+CELL, HEIGHT);
+    iFilledRectangle(0, 0, WIDTH + CELL, HEIGHT);
     // Title
     iSetColor(255, 255, 255);
     iShowText(375, 650, "==Controls==", "assets\\Fonts\\SacrificeDemo-8Ox1B.ttf", 40);
@@ -698,9 +704,9 @@ void Spawn::water(int line_i)
     int dir = line[line_i].dir = (ranint(0, 2) == 0 ? 1 : -1);
 
     if (line_i > 0 && line[line_i - 1].type == Water && line[line_i - 1].dir == dir)
-        line[line_i].speed_factor = std::min(std::max(2.0, (ranint(5, 9)) * FPS / 20.0), (FPS / 20.0) * (line[line_i].speed_factor - 1 - ranint(0, 3)));
+        line[line_i].speed_factor = std::max(10.0, std::min((ranint(5, 9) * FPS / 20.0), (FPS / 20.0) * (line[line_i].speed_factor - 1 - ranint(0, 3))));
     else
-        line[line_i].speed_factor = std::max(2.0, (ranint(5, 9)) * FPS / 20.0);
+        line[line_i].speed_factor = std::max(10.0, (ranint(5, 9)) * FPS / 20.0);
 
     line[line_i].data.clear();
     line[line_i].data.resize(ranint(25, 100));
@@ -1408,14 +1414,14 @@ void iDraw()
             if (splash.frame_id == 0)
                 splash.pos = {player.px - CELL, player.py - SLOPE * player.px};
             iShowLoadedImage(splash.pos.first, splash.pos.second, splash.frames[splash.frame_id]);
-            iShowLoadedImage(player.px, player.py - SLOPE * player.px - CELL / 2.75 * splash.frame_id, &player.file[player.motion]);
+            iShowLoadedImage(player.px, player.py - SLOPE * player.px - CELL / 2.75 * splash.frame_id - (resource_id == 1 ? 10 : 0), &player.file[player.motion]);
         }
         if (Duel && i == player2.y && Collision2 == Drown && splash2.frame_id < splash2.frames.size())
         {
             if (splash2.frame_id == 0)
                 splash2.pos = {player2.px - CELL, player2.py - SLOPE * player2.px};
             iShowLoadedImage(splash2.pos.first, splash2.pos.second, splash2.frames[splash2.frame_id]);
-            iShowLoadedImage(player2.px, player2.py - SLOPE * player2.px - CELL / 2.75 * splash2.frame_id, &player2.file[player2.motion]);
+            iShowLoadedImage(player2.px, player2.py - SLOPE * player2.px - CELL / 2.75 * splash2.frame_id - (resource_id == 1 ? 10 : 0), &player2.file[player2.motion]);
         }
         if (line[i].type == Water)
             Draw::water(i);
@@ -1448,11 +1454,11 @@ void iDraw()
                 int rnd = ranint(0, 5);
                 Audio::playAudio(2, false, 20, resources[resource_id].second[rnd < 1 ? 0 : 1].c_str());
             }
-            iShowLoadedImage((int)player.px, (int)(player.py - SLOPE * player.px) + (int)(9 * (player.frame_no <= (int)round(player_fps / 2.0) ? player.frame_no : player_fps - player.frame_no)), &player.file[player.motion]);
+            iShowLoadedImage((int)player.px, -(resource_id == 1 ? 10 : 0) + (int)(player.py - SLOPE * player.px) + (int)(9 * (player.frame_no <= (int)round(player_fps / 2.0) ? player.frame_no : player_fps - player.frame_no)), &player.file[player.motion]);
         }
         if (Duel && i == player2.y && Collision2 && !deathSound2 && Collision2 != Eagle && Collision2 != FlownWithLog)
         {
-            Audio::playAudio(11, false, 64, resources[resource_id].second[10].c_str());
+            Audio::playAudio(11, false, 64, resources[1].second[2].c_str());//car_crash
             deathSound2 = 1;
         }
 
@@ -1475,7 +1481,7 @@ void iDraw()
                 int rnd = ranint(0, 5);
                 Audio::playAudio(11, false, 20, resources[resource_id].second[10].c_str());
             }
-            iShowLoadedImage((int)player2.px, (int)(player2.py - SLOPE * player2.px) + (int)(9 * (player2.frame_no <= (int)round(player_fps / 2.0) ? player2.frame_no : player_fps - player2.frame_no)), &player2.file[player2.motion]);
+            iShowLoadedImage((int)player2.px, -(resource_id == 1 ? 10 : 0) + (int)(player2.py - SLOPE * player2.px) + (int)(9 * (player2.frame_no <= (int)round(player_fps / 2.0) ? player2.frame_no : player_fps - player2.frame_no)), &player2.file[player2.motion]);
         }
         if (line[i].type == Street)
             Draw::street(i);
@@ -1550,7 +1556,7 @@ void iDraw()
         iSetTransparentColor(255, 255, 255, 0.5);
         iLine(WIDTH / 2, 0, WIDTH / 2, HEIGHT);
     }
-    //drawCoordinateAxes(CELL);
+    // drawCoordinateAxes(CELL);
 }
 
 bool isMouseOverMenuItem(int mx, int my, int itemIndex, int startY, int itemHeight = 50, int xMin = 40, int xMax = 240)
@@ -1601,6 +1607,12 @@ void iMouse(int button, int state, int mx, int my)
                     case 4: // Duel
                         Duel = true;
                         currentGameState = PLAYING;
+                        if (Duel)
+                            resource_id = 0;
+                        else
+                            resource_id = ranint(0, resources.size() - 1);
+
+                        Load_Image();
                         startNewGame();
                         break;
                     }
@@ -1626,9 +1638,16 @@ void iMouse(int button, int state, int mx, int my)
                         break;
                     case 1: // Main Menu
                         Duel = false;
+
+                        if (Duel)
+                            resource_id = 0;
+                        else
+                            resource_id = ranint(0, resources.size() - 1);
+
+                        Load_Image();
                         startNewGame();
                         currentGameState = MAIN_MENU;
-                        //menuSelection = 0;
+                        // menuSelection = 0;
                         break;
                     case 2: // Exit
                         Audio::pauseAudio(Audio::ALL_CHANNELS);
@@ -1648,7 +1667,7 @@ void iMouse(int button, int state, int mx, int my)
             if (isMouseOverMenuItem(mx, my, 0, startY, 50, WIDTH / 2 - 80, WIDTH / 2 + 120))
             {
                 menuSelection = 0; // Back
-                startNewGame();
+                // startNewGame();
                 currentGameState = MAIN_MENU;
                 menuSelection = 0; // Reset to first menu item
             }
@@ -1659,7 +1678,7 @@ void iMouse(int button, int state, int mx, int my)
             if (isMouseOverMenuItem(mx, my, 0, startY, 50, WIDTH / 2 - 80, WIDTH / 2 + 120))
             {
                 menuSelection = 0; // Back
-                startNewGame();
+                // startNewGame();
                 currentGameState = MAIN_MENU;
                 menuSelection = 0; // Reset to first menu item
             }
@@ -1808,6 +1827,12 @@ void iKeyboard(unsigned char key, int state)
             case 4:
                 currentGameState = PLAYING;
                 Duel = true;
+                 if (Duel)
+                    resource_id = 0;
+                else
+                    resource_id = ranint(0, resources.size() - 1);
+
+                Load_Image();
                 startNewGame();
                 break;
             }
@@ -1822,6 +1847,13 @@ void iKeyboard(unsigned char key, int state)
                 break;
             case 1: // Main Menu
                 Duel = false;
+                if (Duel)
+                    resource_id = 0;
+                else
+                    resource_id = ranint(0, resources.size() - 1);
+
+                Load_Image();
+
                 startNewGame();
                 currentGameState = MAIN_MENU;
                 break;
@@ -1837,7 +1869,7 @@ void iKeyboard(unsigned char key, int state)
         {
             if (menuSelection == 0)
             { // Back
-                startNewGame();
+                // startNewGame();
                 currentGameState = MAIN_MENU;
                 menuSelection = 0; // Reset to first menu item
             }
@@ -1895,7 +1927,7 @@ void EagleSpawn()
 
     if (eagle.py < -HEIGHT)
     {
-        if (Collision2)
+        if (!Duel || Duel && Collision2)
             handleGameOver();
         iPauseTimer(Timer::Eagle);
         return;
@@ -1946,7 +1978,7 @@ void EagleSpawn2()
     {
         if (!deathSound2)
         {
-            Audio::playAudio(11, false, 64, resources[resource_id].second[10].c_str());
+            Audio::playAudio(11, false, 64, resources[1].second[2].c_str());//thud sound
             deathSound2 = 1;
         }
     }
@@ -2000,6 +2032,6 @@ int main(int argc, char *argv[])
     Timer::player2 = iSetTimer(PLAYER_SPEED / (player_fps), motion2);
     iPauseTimer(Timer::player2);
     currentGameState = MAIN_MENU;
-    iOpenWindow(WIDTH-25, HEIGHT, "Crossy Road Lite");
+    iOpenWindow(WIDTH - 25, HEIGHT, "Crossy Road Lite");
     return 0;
 }

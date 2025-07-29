@@ -454,7 +454,7 @@ void load_resources()
                         "assets/sounds/quack.wav"}});
     resources.push_back({{"assets\\images\\truck1.png", "assets\\images\\truck2.png", "assets\\images\\car1.png", "assets\\images\\car2.png",
                           "assets/images/rock.png", "assets/images/up3.png", "assets/images/down3.png", "assets/images/left3.png", "assets/images/right3.png", "assets/images/Dead3.png", "assets/images/train(main).png", "assets/images/eagle.png", "assets/images/lilypad.png", "assets\\images\\tree21.png", "assets\\images\\tree22.png", "assets\\images\\tree23.png", "assets\\images\\tree24.png","assets/images/up2.png", "assets/images/down2.png", "assets/images/left2.png", "assets/images/right2.png", "assets/images/dead2.png"},
-                         {"assets\\sounds\\cluck0.wav", "assets\\sounds\\cluck1.wav", "assets\\sounds\\death.wav",
+                         {"assets\\sounds\\spring1.wav", "assets\\sounds\\spring2.wav", "assets\\sounds\\car_crash.wav",
                           "assets\\sounds\\traffic.ogg", "assets\\sounds\\eagle.wav", "assets\\sounds\\train.wav", "assets\\sounds\\train05x.wav", "assets\\sounds\\flown.wav", "assets\\sounds\\drown.wav", "assets\\sounds\\click.wav",
                         "assets/sounds/quack.wav"}});
                         
@@ -481,11 +481,14 @@ int ranint(int l, int r)
 void Load_Image()
 {
     int i = 0;
+    
     for (auto &image : Images)
     {
+        
         iLoadImage(image, resources[resource_id].first[i].c_str());
         i++;
     }
+    
     if (resource_id == 0)
     {
         Draw::water_bg = {99, 227, 255};
@@ -515,13 +518,54 @@ void Load_Image()
         splash2.frames.resize(count_files("assets\\images\\Splash"));
         for (int i = 0; i < splash.frames.size(); ++i)
         {
+            if(!splash.frames[i]) 
             splash.frames[i] = new Image;
             iLoadImage(splash.frames[i], std::string("assets\\images\\Splash\\" + std::to_string(i) + ".png").c_str());
+            if(!splash2.frames[i]) 
             splash2.frames[i] = new Image;
             iLoadImage(splash2.frames[i], std::string("assets\\images\\Splash\\" + std::to_string(i) + ".png").c_str());
         
         }
     }
+    if (resource_id == 1)
+    {
+        Draw::water_bg = {99, 227, 255};
+
+        Draw::log = {79, 47, 49};
+        Draw::log_top = {141, 81, 77};
+        Draw::field_bg = {220, 156, 39};
+
+        auto count_files = [](const std::string &folder) // not for linux
+        {
+            int count = 0;
+            struct _finddata_t fileinfo;
+            intptr_t hFile = _findfirst((folder + "\\*").c_str(), &fileinfo);
+            if (hFile != -1)
+            {
+                do
+                {
+                    if (!(fileinfo.attrib & _A_SUBDIR))
+                        ++count;
+                } while (_findnext(hFile, &fileinfo) == 0);
+                _findclose(hFile);
+            }
+            return count;
+        };
+
+        splash.frames.resize(count_files("assets\\images\\Splash"));
+        splash2.frames.resize(count_files("assets\\images\\Splash"));
+        for (int i = 0; i < splash.frames.size(); ++i)
+        {
+            if(!splash.frames[i]) 
+            splash.frames[i] = new Image;
+            iLoadImage(splash.frames[i], std::string("assets\\images\\Splash\\" + std::to_string(i) + ".png").c_str());
+            if(!splash2.frames[i]) 
+            splash2.frames[i] = new Image;
+            iLoadImage(splash2.frames[i], std::string("assets\\images\\Splash\\" + std::to_string(i) + ".png").c_str());
+        
+        }
+    }
+    //loaded_once = true;
 }
 #ifdef _WIN32
 #include <windows.h>
