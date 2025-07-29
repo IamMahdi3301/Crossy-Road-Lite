@@ -8,8 +8,8 @@
 int resource_id;
 #define SLOPE 0.2679491924
 #include "iGraphics.h"
-#define HEIGHT 1024
-#define WIDTH 1000
+ int HEIGHT = 1024;
+ int WIDTH = 1000;
 #define CELL 50 // multiple of 10
 const int ROW = 1.0 * HEIGHT / CELL;
 #define start_y 5
@@ -517,3 +517,17 @@ void Load_Image()
         }
     }
 }
+#ifdef _WIN32
+#include <windows.h>
+void DisableResize() {
+    HWND hwnd = FindWindowA(NULL, "Crossy Road Lite"); // Use your window title
+    if (hwnd) {
+        LONG style = GetWindowLong(hwnd, GWL_STYLE);
+        style &= ~(WS_MAXIMIZEBOX | WS_THICKFRAME); // Disable maximize + resizing
+        SetWindowLong(hwnd, GWL_STYLE, style);
+        SetWindowPos(hwnd, NULL, 0, 0, 0, 0,
+                     SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+    }
+}
+#endif
+
