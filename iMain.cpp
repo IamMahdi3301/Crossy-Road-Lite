@@ -1,8 +1,5 @@
 #include "headers_and_declarations.cpp"
-/*
-got exit code -1073740771. Check code. Happens when transiting from game over
-Memory leak in audio?
-*/
+
 enum GameState
 {
     MAIN_MENU,
