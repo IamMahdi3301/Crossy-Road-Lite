@@ -1,5 +1,7 @@
 # How to play  
-Download the `release` folder and run `game.exe`  
+Download the `release` folder and run `Crossy Road Lite.exe`  
+## Gameplay  
+[Click to watch gameplay](https://www.facebook.com/share/v/16eFEdpysx/)  
 # Editing Source Code  
 ### Source Code  
 1. iMain.cpp
